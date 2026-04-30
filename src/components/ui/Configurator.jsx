@@ -1,7 +1,7 @@
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 import { TextControls } from './TextControls'
 import { LogoControls } from './LogoControls'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 export const Configurator = () => {
   const { 
@@ -16,10 +16,30 @@ export const Configurator = () => {
     logoUrl,
     logoPosition,
     logoRotation,
-    logoScale
+    logoScale,
+    setTextContent,
+    setTextColor,
+    setFontSize,
+    setTextPosition,
+    setTextRotation,
+    setTextScale,
+    setLogoUrl,
+    setLogoPosition,
+    setLogoRotation,
+    setLogoScale
   } = useCustomizationStore()
 
   const queryClient = useQueryClient()
+
+  // Fetch designs from server
+  const { data: designs, isLoading } = useQuery({
+    queryKey: ['designs'],
+    queryFn: async () => {
+      const response = await fetch('http://localhost:5000/api/designs')
+      if (!response.ok) throw new Error('Failed to load')
+      return response.json()
+    }
+  })
 
   const saveMutation = useMutation({
     mutationFn: async (designData) => {
@@ -46,6 +66,24 @@ export const Configurator = () => {
       logo: { logoUrl, logoPosition, logoRotation, logoScale }
     }
     saveMutation.mutate(designData)
+  }
+
+  const handleLoadDesign = (design) => {
+    // Load Text
+    setTextContent(design.text.textContent)
+    setTextColor(design.text.textColor)
+    setFontSize(design.text.fontSize)
+    setTextPosition(design.text.textPosition)
+    setTextRotation(design.text.textRotation)
+    setTextScale(design.text.textScale)
+    
+    // Load Logo
+    setLogoUrl(design.logo.logoUrl)
+    setLogoPosition(design.logo.logoPosition)
+    setLogoRotation(design.logo.logoRotation)
+    setLogoScale(design.logo.logoScale)
+    
+    alert('🎨 Design loaded!')
   }
 
   return (
@@ -77,6 +115,46 @@ export const Configurator = () => {
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
         {activeTab === 'text' ? <TextControls /> : <LogoControls />}
+
+        {/* ── Saved Designs List ── */}
+        <div style={{ marginTop: '40px' }}>
+          <div className="section-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span>Saved Library</span>
+            <button className="btn-reset" onClick={() => queryClient.invalidateQueries({ queryKey: ['designs'] })}>
+              Refresh
+            </button>
+          </div>
+          
+          {isLoading ? (
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Loading library...</div>
+          ) : designs?.length > 0 ? (
+            <div style={{ display: 'grid', gap: '10px' }}>
+              {designs.map((design) => (
+                <button
+                  key={design.id}
+                  onClick={() => handleLoadDesign(design)}
+                  className="premium-input"
+                  style={{ 
+                    textAlign: 'left', 
+                    fontSize: '0.8rem', 
+                    padding: '10px', 
+                    cursor: 'pointer',
+                    background: 'rgba(255,255,255,0.02)'
+                  }}
+                >
+                  <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>Design #{design.id.slice(-4)}</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                    {new Date(design.createdAt).toLocaleDateString()} at {new Date(design.createdAt).toLocaleTimeString()}
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontStyle: 'italic' }}>
+              No designs saved yet.
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ── Footer / Save Section ── */}
