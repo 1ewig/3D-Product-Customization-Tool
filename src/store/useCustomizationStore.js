@@ -5,13 +5,13 @@ export const useCustomizationStore = create((set) => ({
   textContent: '',
   textColor: '#ffffff',
   fontSize: 48,
-  textPosition: { x: 0, y: 0 },
+  textPosition: { x: 0, y: 0, z: 0.3 },
   textRotation: 0,
   textScale: 1,
 
   // Logo State
   logoUrl: null,
-  logoPosition: { x: 0, y: 0 },
+  logoPosition: { x: 0, y: 0, z: 0.31 },
   logoRotation: 0,
   logoScale: 1,
 

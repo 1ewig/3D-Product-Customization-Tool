@@ -7,7 +7,10 @@ import { LogoOverlay } from './LogoOverlay'
 
 export const SceneCanvas = () => {
   return (
-    <Canvas style={{ width: '100vw', height: '100vh' }}>
+    <Canvas 
+      style={{ width: '100vw', height: '100vh' }}
+      gl={{ antialias: true, alpha: true }}
+    >
       <PerspectiveCamera makeDefault position={[0, 0, 3]} fov={45} />
       <ambientLight intensity={0.5} />
       <directionalLight position={[5, 5, 5]} intensity={1} />

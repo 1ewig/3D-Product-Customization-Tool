@@ -115,6 +115,22 @@ export const LogoControls = () => {
 
       <div style={controlStyle}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+          <label style={labelStyle}>Z Position: {logoPosition.z}</label>
+          <button style={resetButtonStyle} onClick={() => setLogoPosition({ ...logoPosition, z: 0.31 })}>Reset</button>
+        </div>
+        <input 
+          type="range" 
+          min="0" 
+          max="1" 
+          step="0.01" 
+          value={logoPosition.z} 
+          onChange={(e) => setLogoPosition({ ...logoPosition, z: parseFloat(e.target.value) })} 
+          style={{ width: '100%' }}
+        />
+      </div>
+
+      <div style={controlStyle}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
           <label style={labelStyle}>Rotation: {logoRotation}</label>
           <button style={resetButtonStyle} onClick={() => setLogoRotation(0)}>Reset</button>
         </div>

@@ -20,7 +20,7 @@ export const LogoOverlay = () => {
 
   return (
     <mesh
-      position={[logoPosition.x, logoPosition.y, 0.76]}
+      position={[logoPosition.x, logoPosition.y, logoPosition.z]}
       rotation={[0, 0, logoRotation]}
       scale={[logoScale, logoScale, logoScale]}
     >
@@ -29,6 +29,8 @@ export const LogoOverlay = () => {
         map={texture} 
         transparent={true} 
         depthWrite={false}
+        polygonOffset={true}
+        polygonOffsetFactor={-1}
       />
     </mesh>
   )

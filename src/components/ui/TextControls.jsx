@@ -131,6 +131,22 @@ export const TextControls = () => {
 
       <div style={controlStyle}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+          <label style={labelStyle}>Z Position: {textPosition.z}</label>
+          <button style={resetButtonStyle} onClick={() => setTextPosition({ ...textPosition, z: 0.3 })}>Reset</button>
+        </div>
+        <input 
+          type="range" 
+          min="0" 
+          max="1" 
+          step="0.01" 
+          value={textPosition.z} 
+          onChange={(e) => setTextPosition({ ...textPosition, z: parseFloat(e.target.value) })} 
+          style={{ width: '100%' }}
+        />
+      </div>
+
+      <div style={controlStyle}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
           <label style={labelStyle}>Rotation: {textRotation}</label>
           <button style={resetButtonStyle} onClick={() => setTextRotation(0)}>Reset</button>
         </div>

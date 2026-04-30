@@ -23,7 +23,7 @@ export const TextOverlay = () => {
 
   return (
     <mesh
-      position={[textPosition.x, textPosition.y, 0.75]}
+      position={[textPosition.x, textPosition.y, textPosition.z]}
       rotation={[0, 0, textRotation]}
       scale={[textScale, textScale, textScale]}
     >
@@ -32,6 +32,8 @@ export const TextOverlay = () => {
         map={texture} 
         transparent={true} 
         depthWrite={false}
+        polygonOffset={true}
+        polygonOffsetFactor={-1}
       />
     </mesh>
   )
