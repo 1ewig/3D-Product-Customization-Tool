@@ -1,11 +1,18 @@
+/**
+ * Configurator Sidebar Component
+ * This is the main UI hub that holds the tabs for Text, Image, and Library.
+ * It also handles the API mutation for saving designs to the backend.
+ */
+
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 import { TextControls } from './TextControls'
 import { LogoControls } from './LogoControls'
 import { LibrarySidebar } from './LibrarySidebar'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
 export const Configurator = () => {
+  // Extract all necessary state and setters from the global store
   const { 
     activeTab, 
     setActiveTab,
@@ -19,20 +26,15 @@ export const Configurator = () => {
     logoPosition,
     logoRotation,
     logoScale,
-    setTextContent,
-    setTextColor,
-    setFontSize,
-    setTextPosition,
-    setTextRotation,
-    setTextScale,
-    setLogoUrl,
-    setLogoPosition,
-    setLogoRotation,
-    setLogoScale
   } = useCustomizationStore()
 
   const queryClient = useQueryClient()
 
+  // ─── API MUTATION ──────────────────────────────────────────────────────────
+  /**
+   * Mutation to save the current design state to the Express/Vercel backend.
+   * This sends both text properties and the Base64 logo data.
+   */
   const saveMutation = useMutation({
     mutationFn: async (designData) => {
       const response = await fetch('/api/designs', {
@@ -45,6 +47,7 @@ export const Configurator = () => {
     },
     onSuccess: () => {
       toast.success('Design saved to server!', { icon: '✨' })
+      // Refresh the library data automatically
       queryClient.invalidateQueries({ queryKey: ['designs'] })
     },
     onError: (error) => {
@@ -52,6 +55,9 @@ export const Configurator = () => {
     }
   })
 
+  /**
+   * Bundles the current store state into a design object for saving.
+   */
   const handleSave = () => {
     const designData = {
       text: { textContent, textColor, fontSize, textPosition, textRotation, textScale },
@@ -62,6 +68,7 @@ export const Configurator = () => {
 
   return (
     <div className="glass-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* ── Tab Navigation ── */}
       <div className="tab-container">
         <button 
           className={`tab-item ${activeTab === 'text' ? 'active text' : ''}`}
@@ -96,13 +103,14 @@ export const Configurator = () => {
         </button>
       </div>
 
+      {/* ── Main Control Content ── */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
         {activeTab === 'text' && <TextControls />}
         {activeTab === 'image' && <LogoControls />}
         {activeTab === 'library' && <LibrarySidebar />}
       </div>
 
-      {/* ── Footer / Save Section ── */}
+      {/* ── Footer / Save Action ── */}
       <div style={{ padding: '16px', borderTop: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.1)' }}>
         <button 
           className="btn-select active text" 

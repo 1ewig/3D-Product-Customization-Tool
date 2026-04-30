@@ -1,3 +1,10 @@
+/**
+ * Vercel Serverless Function - Express Backend
+ * This file serves as the main entry point for the backend API.
+ * It handles persistent storage using Vercel KV in production 
+ * and falls back to the local filesystem during development.
+ */
+
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
@@ -5,22 +12,27 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { kv } from '@vercel/kv';
 
+// ESM dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Use /tmp for data storage locally if needed, but on Vercel we'll prioritize KV
-const DATA_FILE = path.join('/tmp', 'designs.json');
-const KV_KEY = 'product_designs';
+// Configuration for local vs cloud storage
+const DATA_FILE = path.join('/tmp', 'designs.json'); // Local fallback (ephemeral on Vercel)
+const KV_KEY = 'product_designs';                  // Redis key for Vercel KV
 
+// Middleware setup
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '10mb' })); // Higher limit to support Base64 image strings
 
-// Helper to read data (Hybrid: KV for production, FS for local)
+/**
+ * Reads design data from the best available storage source.
+ * Prioritizes Vercel KV (Redis) if configured.
+ */
 const readData = async () => {
-  // Try Vercel KV first
+  // Check if Vercel KV environment variables are present
   if (process.env.KV_REST_API_URL) {
     try {
       const designs = await kv.get(KV_KEY);
@@ -30,7 +42,7 @@ const readData = async () => {
     }
   }
 
-  // Fallback to local file system
+  // Fallback: Read from local /tmp file system
   if (!fs.existsSync(DATA_FILE)) return [];
   try {
     const data = fs.readFileSync(DATA_FILE);
@@ -40,9 +52,11 @@ const readData = async () => {
   }
 };
 
-// Helper to write data
+/**
+ * Writes design data to the best available storage source.
+ */
 const writeData = async (data) => {
-  // Try Vercel KV first
+  // Save to Vercel KV if available
   if (process.env.KV_REST_API_URL) {
     try {
       await kv.set(KV_KEY, data);
@@ -52,7 +66,7 @@ const writeData = async (data) => {
     }
   }
 
-  // Fallback to local file system
+  // Fallback: Write to local /tmp file system
   try {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
   } catch (e) {
@@ -60,7 +74,12 @@ const writeData = async (data) => {
   }
 };
 
-// API Routes
+// ─── API ROUTES ──────────────────────────────────────────────────────────────
+
+/**
+ * GET /api/designs
+ * Fetches all saved product customization designs.
+ */
 app.get('/api/designs', async (req, res) => {
   try {
     const designs = await readData();
@@ -70,6 +89,10 @@ app.get('/api/designs', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/designs
+ * Saves a new customization design (includes text and Base64 image data).
+ */
 app.post('/api/designs', async (req, res) => {
   try {
     const designs = await readData();
@@ -86,6 +109,10 @@ app.post('/api/designs', async (req, res) => {
   }
 });
 
+/**
+ * DELETE /api/designs/:id
+ * Removes a specific design from the library by its ID.
+ */
 app.delete('/api/designs/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -98,11 +125,14 @@ app.delete('/api/designs/:id', async (req, res) => {
   }
 });
 
-// For local development
+/**
+ * Local server initiation (bypassed on Vercel deployment)
+ */
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
   });
 }
 
+// Export for Vercel Serverless Function handling
 export default app;

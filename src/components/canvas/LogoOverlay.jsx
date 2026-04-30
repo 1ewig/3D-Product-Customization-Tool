@@ -1,17 +1,28 @@
+/**
+ * Logo Overlay Component
+ * Handles the loading and display of user-uploaded logo images.
+ * Supports standard URLs and Base64 encoded strings.
+ */
+
 import { useState, useEffect, forwardRef } from 'react'
 import * as THREE from 'three'
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 
-// forwardRef so SceneCanvas can attach TransformControls to this mesh
+// ForwardRef allows the parent (SceneCanvas) to attach TransformControls to this mesh
 export const LogoOverlay = forwardRef(function LogoOverlay(_, ref) {
+  // Extract state from global store
   const { logoUrl, logoPosition, logoRotation, logoScale } = useCustomizationStore()
   const [texture, setTexture] = useState(null)
 
+  /**
+   * Loads the image into a Three.js Texture whenever the URL changes.
+   */
   useEffect(() => {
     if (!logoUrl) {
       setTexture(null)
       return
     }
+    
     const loader = new THREE.TextureLoader()
     loader.load(logoUrl, (loadedTexture) => {
       loadedTexture.needsUpdate = true
@@ -19,6 +30,7 @@ export const LogoOverlay = forwardRef(function LogoOverlay(_, ref) {
     })
   }, [logoUrl])
 
+  // Don't render until the texture is fully loaded
   if (!logoUrl || !texture) return null
 
   return (
@@ -32,9 +44,9 @@ export const LogoOverlay = forwardRef(function LogoOverlay(_, ref) {
       <meshBasicMaterial
         map={texture}
         transparent={true}
-        depthWrite={false}
-        polygonOffset={true}
-        polygonOffsetFactor={-1}
+        depthWrite={false} // Prevents "box" outline artifacts on the model
+        polygonOffset={true} // Z-fighting prevention
+        polygonOffsetFactor={-1} // Moves the overlay slightly "forward" in the depth buffer
       />
     </mesh>
   )

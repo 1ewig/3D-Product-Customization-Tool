@@ -1,3 +1,9 @@
+/**
+ * Main 3D Scene Component
+ * This component sets up the Three.js Canvas, lighting, camera, and controls.
+ * It manages the coordination between the 3D model, overlays, and interactive gizmos.
+ */
+
 import { Suspense, useRef, useCallback, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Center, PerspectiveCamera, TransformControls } from '@react-three/drei'
@@ -8,14 +14,16 @@ import { ViewportToolbar } from '../ui'
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 
 export const SceneCanvas = () => {
-  const orbitRef = useRef()
-  const textMeshRef = useRef()
-  const logoMeshRef = useRef()
+  // ─── REFS ──────────────────────────────────────────────────────────────────
+  const orbitRef = useRef()        // Reference to OrbitControls to enable/disable during drag
+  const textMeshRef = useRef()     // Reference to the text overlay mesh for TransformControls
+  const logoMeshRef = useRef()     // Reference to the logo overlay mesh for TransformControls
 
-  // We use local state to force a re-render after refs are populated
+  // Local state to track when overlays are actually rendered in the DOM/Scene
   const [textMounted, setTextMounted] = useState(false)
   const [logoMounted, setLogoMounted] = useState(false)
 
+  // ─── STORE STATE ───────────────────────────────────────────────────────────
   const {
     selectedObject,
     setSelectedObject,
@@ -30,7 +38,10 @@ export const SceneCanvas = () => {
     setLogoScale,
   } = useCustomizationStore()
 
-  // Sync TransformControls changes back to the Zustand store
+  /**
+   * Synchronizes the 3D mesh transformation back to the global store.
+   * Called whenever the user manipulates the TransformControls gizmo.
+   */
   const handleTransformChange = useCallback(() => {
     if (selectedObject === 'text' && textMeshRef.current) {
       const m = textMeshRef.current
@@ -45,86 +56,94 @@ export const SceneCanvas = () => {
     }
   }, [selectedObject, setTextPosition, setTextRotation, setTextScale, setLogoPosition, setLogoRotation, setLogoScale])
 
-  // Disable OrbitControls while dragging the gizmo to prevent conflict
+  // Disable camera rotation while the user is dragging the gizmo
   const handleDragStart = () => {
     if (orbitRef.current) orbitRef.current.enabled = false
   }
+  
+  // Re-enable camera rotation and sync final position when dragging ends
   const handleDragEnd = () => {
     if (orbitRef.current) orbitRef.current.enabled = true
     handleTransformChange()
   }
 
-  // Click on empty canvas to deselect
+  // Deselect objects when clicking on empty space
   const handleCanvasPointerMissed = () => {
     setSelectedObject(null)
   }
 
-  // Ref callback for text mesh – triggers re-render so TransformControls can attach
+  // Ref callbacks to trigger re-renders so TransformControls can attach to the nodes
   const textRefCallback = useCallback((node) => {
     textMeshRef.current = node
     setTextMounted(!!node)
   }, [])
 
-  // Ref callback for logo mesh
   const logoRefCallback = useCallback((node) => {
     logoMeshRef.current = node
     setLogoMounted(!!node)
   }, [])
 
+  // Visibility logic for Transform Gizmos
   const showTextGizmo = selectedObject === 'text' && textContent && textMounted && textMeshRef.current
   const showLogoGizmo = selectedObject === 'logo' && logoUrl && logoMounted && logoMeshRef.current
 
   return (
     <>
       <Canvas
-      style={{ width: '100%', height: '100vh' }}
-      gl={{ antialias: true, alpha: true }}
-      onPointerMissed={handleCanvasPointerMissed}
-    >
-      <PerspectiveCamera makeDefault position={[0, 0, 3]} fov={45} />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[5, 5, 5]} intensity={1} />
-      <directionalLight position={[-5, 5, -5]} intensity={0.4} />
+        style={{ width: '100%', height: '100vh' }}
+        gl={{ antialias: true, alpha: true }}
+        onPointerMissed={handleCanvasPointerMissed}
+      >
+        {/* Camera and Lighting */}
+        <PerspectiveCamera makeDefault position={[0, 0, 3]} fov={45} />
+        <ambientLight intensity={0.6} />
+        <directionalLight position={[5, 5, 5]} intensity={1} />
+        <directionalLight position={[-5, 5, -5]} intensity={0.4} />
 
-      <OrbitControls
-        ref={orbitRef}
-        enableZoom={true}
-        enableRotate={true}
-        minDistance={1.5}
-        maxDistance={6}
-      />
+        {/* View Controls */}
+        <OrbitControls
+          ref={orbitRef}
+          enableZoom={true}
+          enableRotate={true}
+          minDistance={1.5}
+          maxDistance={6}
+        />
 
-      <Suspense fallback={null}>
-        <Center>
-          <ShirtModel />
-        </Center>
+        <Suspense fallback={null}>
+          {/* Main 3D Model centered in the viewport */}
+          <Center>
+            <ShirtModel />
+          </Center>
 
-        {textContent && <TextOverlay ref={textRefCallback} />}
-        {logoUrl && <LogoOverlay ref={logoRefCallback} />}
+          {/* Overlays */}
+          {textContent && <TextOverlay ref={textRefCallback} />}
+          {logoUrl && <LogoOverlay ref={logoRefCallback} />}
 
-        {showTextGizmo && (
-          <TransformControls
-            object={textMeshRef.current}
-            mode={transformMode}
-            onMouseDown={handleDragStart}
-            onMouseUp={handleDragEnd}
-            onChange={handleTransformChange}
-          />
-        )}
+          {/* Interaction Gizmos (Translation/Rotation/Scaling tools) */}
+          {showTextGizmo && (
+            <TransformControls
+              object={textMeshRef.current}
+              mode={transformMode}
+              onMouseDown={handleDragStart}
+              onMouseUp={handleDragEnd}
+              onChange={handleTransformChange}
+            />
+          )}
 
-        {showLogoGizmo && (
-          <TransformControls
-            object={logoMeshRef.current}
-            mode={transformMode}
-            onMouseDown={handleDragStart}
-            onMouseUp={handleDragEnd}
-            onChange={handleTransformChange}
-          />
-        )}
-      </Suspense>
-    </Canvas>
+          {showLogoGizmo && (
+            <TransformControls
+              object={logoMeshRef.current}
+              mode={transformMode}
+              onMouseDown={handleDragStart}
+              onMouseUp={handleDragEnd}
+              onChange={handleTransformChange}
+            />
+          )}
+        </Suspense>
+      </Canvas>
 
-    <ViewportToolbar orbitRef={orbitRef} />
-  </>
-)
+      {/* Floating Toolbar for scene-level controls */}
+      <ViewportToolbar orbitRef={orbitRef} />
+    </>
+  )
 }
