@@ -14,6 +14,7 @@ export const LogoControls = () => {
     setLogoScale,
     setSelectedObject,
     setTransformMode,
+    resetLogo,
   } = useCustomizationStore()
 
   const isSelected = selectedObject === 'logo'
@@ -29,7 +30,15 @@ export const LogoControls = () => {
 
   return (
     <div style={{ marginTop: '24px' }}>
-      <h2 className="section-header">Logo / Image</h2>
+      <div className="section-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span>Logo / Image</span>
+        <button className="btn-reset" onClick={resetLogo} title="Reset All Logo Properties">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
+        </button>
+      </div>
 
       {/* ── Upload ── */}
       <div className="control-group">

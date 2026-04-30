@@ -34,4 +34,22 @@ export const useCustomizationStore = create((set) => ({
   setLogoScale: (logoScale) => set({ logoScale }),
   setSelectedObject: (selectedObject) => set({ selectedObject }),
   setTransformMode: (transformMode) => set({ transformMode }),
+
+  resetText: () => set({
+    textContent: '',
+    textColor: '#ffffff',
+    fontSize: 48,
+    textPosition: { x: 0, y: 0, z: 0.3 },
+    textRotation: 0,
+    textScale: 1,
+    selectedObject: null
+  }),
+
+  resetLogo: () => set({
+    logoUrl: null,
+    logoPosition: { x: 0, y: 0, z: 0.31 },
+    logoRotation: 0,
+    logoScale: 1,
+    selectedObject: null
+  }),
 }))
