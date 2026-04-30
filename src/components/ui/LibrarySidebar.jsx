@@ -1,5 +1,6 @@
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
 
 export const LibrarySidebar = () => {
   const { 
@@ -39,7 +40,7 @@ export const LibrarySidebar = () => {
     setLogoRotation(design.logo.logoRotation)
     setLogoScale(design.logo.logoScale)
     
-    alert('🎨 Design loaded!')
+    toast.success('Design loaded from library', { icon: '🎨' })
   }
 
   return (

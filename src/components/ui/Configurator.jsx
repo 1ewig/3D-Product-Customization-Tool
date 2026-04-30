@@ -2,6 +2,7 @@ import { useCustomizationStore } from '../../store/useCustomizationStore'
 import { TextControls } from './TextControls'
 import { LogoControls } from './LogoControls'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
 
 export const Configurator = () => {
   const { 
@@ -42,11 +43,11 @@ export const Configurator = () => {
       return response.json()
     },
     onSuccess: () => {
-      alert('✨ Design saved successfully to the server!')
+      toast.success('Design saved to server!', { icon: '✨' })
       queryClient.invalidateQueries({ queryKey: ['designs'] })
     },
     onError: (error) => {
-      alert('❌ Error saving design: ' + error.message)
+      toast.error('Failed to save design: ' + error.message)
     }
   })
 
