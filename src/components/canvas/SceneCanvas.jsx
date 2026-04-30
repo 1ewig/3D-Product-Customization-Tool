@@ -122,8 +122,9 @@ export const SceneCanvas = () => {
           />
         )}
       </Suspense>
+    </Canvas>
 
-      <ViewportToolbar orbitRef={orbitRef} />
-    </>
-  )
+    <ViewportToolbar orbitRef={orbitRef} />
+  </>
+)
 }
