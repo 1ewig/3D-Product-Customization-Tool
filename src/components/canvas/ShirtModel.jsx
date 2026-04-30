@@ -8,7 +8,7 @@ export const ShirtModel = () => {
     <primitive 
       object={gltf.scene} 
       position={[0, 0, 0]} 
-      scale={[1, 1, 1]} 
+      scale={[1.5, 1.5, 1.5]} 
     />
   )
 }
