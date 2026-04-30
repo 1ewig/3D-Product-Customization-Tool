@@ -1,15 +1,16 @@
-import { useMemo } from 'react'
+import { useMemo, forwardRef } from 'react'
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 import { createTextTexture } from '../../utils/createTextTexture'
 
-export const TextOverlay = () => {
+// forwardRef so SceneCanvas can attach TransformControls to this mesh
+export const TextOverlay = forwardRef(function TextOverlay(_, ref) {
   const {
     textContent,
     textColor,
     fontSize,
     textPosition,
     textRotation,
-    textScale
+    textScale,
   } = useCustomizationStore()
 
   const texture = useMemo(() => {
@@ -23,18 +24,19 @@ export const TextOverlay = () => {
 
   return (
     <mesh
+      ref={ref}
       position={[textPosition.x, textPosition.y, textPosition.z]}
       rotation={[0, 0, textRotation]}
       scale={[textScale, textScale, textScale]}
     >
       <planeGeometry args={[1, 0.5]} />
-      <meshBasicMaterial 
-        map={texture} 
-        transparent={true} 
+      <meshBasicMaterial
+        map={texture}
+        transparent={true}
         depthWrite={false}
         polygonOffset={true}
         polygonOffsetFactor={-1}
       />
     </mesh>
   )
-}
+})

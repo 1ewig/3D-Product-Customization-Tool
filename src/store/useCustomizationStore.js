@@ -15,6 +15,12 @@ export const useCustomizationStore = create((set) => ({
   logoRotation: 0,
   logoScale: 1,
 
+  // Interaction State
+  // null | 'text' | 'logo'
+  selectedObject: null,
+  // 'translate' | 'rotate' | 'scale'
+  transformMode: 'translate',
+
   // Setters
   setTextContent: (textContent) => set({ textContent }),
   setTextColor: (textColor) => set({ textColor }),
@@ -26,4 +32,6 @@ export const useCustomizationStore = create((set) => ({
   setLogoPosition: (logoPosition) => set({ logoPosition }),
   setLogoRotation: (logoRotation) => set({ logoRotation }),
   setLogoScale: (logoScale) => set({ logoScale }),
+  setSelectedObject: (selectedObject) => set({ selectedObject }),
+  setTransformMode: (transformMode) => set({ transformMode }),
 }))
