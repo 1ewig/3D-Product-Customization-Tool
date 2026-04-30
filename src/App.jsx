@@ -1,6 +1,6 @@
 import './App.css'
 import { SceneCanvas } from './components/canvas/SceneCanvas'
-import { Configurator, LibrarySidebar } from './components/ui'
+import { Configurator } from './components/ui'
 import { Toaster } from 'react-hot-toast'
 
 function App() {
@@ -15,7 +15,6 @@ function App() {
           borderRadius: '12px',
         },
       }} />
-      <LibrarySidebar />
       <div className="canvas-container">
         <SceneCanvas />
       </div>

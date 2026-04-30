@@ -1,6 +1,7 @@
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 import { TextControls } from './TextControls'
 import { LogoControls } from './LogoControls'
+import { LibrarySidebar } from './LibrarySidebar'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
@@ -84,10 +85,21 @@ export const Configurator = () => {
           </svg>
           Image
         </button>
+        <button 
+          className={`tab-item ${activeTab === 'library' ? 'active library' : ''}`}
+          onClick={() => setActiveTab('library')}
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+          </svg>
+          Library
+        </button>
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
-        {activeTab === 'text' ? <TextControls /> : <LogoControls />}
+        {activeTab === 'text' && <TextControls />}
+        {activeTab === 'image' && <LogoControls />}
+        {activeTab === 'library' && <LibrarySidebar />}
       </div>
 
       {/* ── Footer / Save Section ── */}

@@ -97,8 +97,9 @@ body {
   z-index: 10;
 }
 
-.library-container {
-  width: 280px;
+.ui-container {
+  width: 340px;
+  max-width: 90vw;
   flex-shrink: 0;
   z-index: 10;
 }
@@ -395,4 +396,8 @@ body {
 
 .tab-item.active.image {
   border-bottom: 2px solid var(--accent-green);
+}
+
+.tab-item.active.library {
+  border-bottom: 2px solid var(--accent-blue); /* Or a different color if preferred */
 }

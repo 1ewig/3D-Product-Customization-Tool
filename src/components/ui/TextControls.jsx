@@ -80,7 +80,7 @@ export const TextControls = () => {
       <div className="control-group">
         <div className="control-header">
           <label className="control-label">Color</label>
-          <button className="btn-reset" onClick={() => setTextColor('#ffffff')}>Reset</button>
+          <button className="btn-reset" onClick={() => setTextColor('#000000')}>Reset</button>
         </div>
         <input
           type="color"

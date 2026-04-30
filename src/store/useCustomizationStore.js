@@ -6,7 +6,7 @@ export const useCustomizationStore = create(
     (set) => ({
   // Text State
   textContent: '',
-  textColor: '#ffffff',
+  textColor: '#000000',
   fontSize: 48,
   textPosition: { x: 0, y: 0, z: 0.3 },
   textRotation: 0,
@@ -43,7 +43,7 @@ export const useCustomizationStore = create(
 
   resetText: () => set({
     textContent: '',
-    textColor: '#ffffff',
+    textColor: '#000000',
     fontSize: 48,
     textPosition: { x: 0, y: 0, z: 0.3 },
     textRotation: 0,
