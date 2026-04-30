@@ -4,6 +4,7 @@ import { OrbitControls, Center, PerspectiveCamera, TransformControls } from '@re
 import { ShirtModel } from './ShirtModel'
 import { TextOverlay } from './TextOverlay'
 import { LogoOverlay } from './LogoOverlay'
+import { ViewportToolbar } from '../ui'
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 
 export const SceneCanvas = () => {
@@ -74,7 +75,8 @@ export const SceneCanvas = () => {
   const showLogoGizmo = selectedObject === 'logo' && logoUrl && logoMounted && logoMeshRef.current
 
   return (
-    <Canvas
+    <>
+      <Canvas
       style={{ width: '100%', height: '100vh' }}
       gl={{ antialias: true, alpha: true }}
       onPointerMissed={handleCanvasPointerMissed}
@@ -120,6 +122,8 @@ export const SceneCanvas = () => {
           />
         )}
       </Suspense>
-    </Canvas>
+
+      <ViewportToolbar orbitRef={orbitRef} />
+    </>
   )
 }
