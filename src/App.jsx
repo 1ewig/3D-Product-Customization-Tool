@@ -4,11 +4,13 @@ import { TextControls } from './components/ui/TextControls'
 
 function App() {
   return (
-    <div className="app-container" style={{ display: 'flex' }}>
-      <div style={{ width: 'calc(100vw - 280px)', height: '100vh', position: 'relative' }}>
+    <div className="app-layout">
+      <div className="canvas-container">
         <SceneCanvas />
       </div>
-      <TextControls />
+      <div className="ui-container glass-panel">
+        <TextControls />
+      </div>
     </div>
   )
 }
