@@ -32,7 +32,7 @@ export const Configurator = () => {
         </button>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
         {activeTab === 'text' ? <TextControls /> : <LogoControls />}
       </div>
     </div>

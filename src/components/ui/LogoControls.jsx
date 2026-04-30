@@ -29,7 +29,7 @@ export const LogoControls = () => {
   }
 
   return (
-    <div style={{ marginTop: '24px' }}>
+    <div>
       <div className="section-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span>Logo / Image</span>
         <button className="btn-reset" onClick={resetLogo} title="Reset All Logo Properties">

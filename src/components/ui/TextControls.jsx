@@ -24,7 +24,7 @@ export const TextControls = () => {
   const isSelected = selectedObject === 'text'
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div>
       <div className="section-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span>Text Overlay</span>
         <button className="btn-reset" onClick={resetText} title="Reset All Text Properties">
