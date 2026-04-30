@@ -1,6 +1,9 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
-export const useCustomizationStore = create((set) => ({
+export const useCustomizationStore = create(
+  persist(
+    (set) => ({
   // Text State
   textContent: '',
   textColor: '#ffffff',
@@ -55,4 +58,4 @@ export const useCustomizationStore = create((set) => ({
     logoScale: 1,
     selectedObject: null
   }),
-}))
+}), { name: 'product-customization-storage' }))

@@ -1,9 +1,52 @@
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 import { TextControls } from './TextControls'
 import { LogoControls } from './LogoControls'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 export const Configurator = () => {
-  const { activeTab, setActiveTab } = useCustomizationStore()
+  const { 
+    activeTab, 
+    setActiveTab,
+    textContent,
+    textColor,
+    fontSize,
+    textPosition,
+    textRotation,
+    textScale,
+    logoUrl,
+    logoPosition,
+    logoRotation,
+    logoScale
+  } = useCustomizationStore()
+
+  const queryClient = useQueryClient()
+
+  const saveMutation = useMutation({
+    mutationFn: async (designData) => {
+      const response = await fetch('http://localhost:5000/api/designs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(designData),
+      })
+      if (!response.ok) throw new Error('Failed to save')
+      return response.json()
+    },
+    onSuccess: () => {
+      alert('✨ Design saved successfully to the server!')
+      queryClient.invalidateQueries({ queryKey: ['designs'] })
+    },
+    onError: (error) => {
+      alert('❌ Error saving design: ' + error.message)
+    }
+  })
+
+  const handleSave = () => {
+    const designData = {
+      text: { textContent, textColor, fontSize, textPosition, textRotation, textScale },
+      logo: { logoUrl, logoPosition, logoRotation, logoScale }
+    }
+    saveMutation.mutate(designData)
+  }
 
   return (
     <div className="glass-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -34,6 +77,18 @@ export const Configurator = () => {
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
         {activeTab === 'text' ? <TextControls /> : <LogoControls />}
+      </div>
+
+      {/* ── Footer / Save Section ── */}
+      <div style={{ padding: '16px', borderTop: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.1)' }}>
+        <button 
+          className="btn-select active text" 
+          style={{ width: '100%', padding: '12px', fontSize: '0.9rem' }}
+          onClick={handleSave}
+          disabled={saveMutation.isPending}
+        >
+          {saveMutation.isPending ? 'Saving...' : 'Save Design to Server'}
+        </button>
       </div>
     </div>
   )
