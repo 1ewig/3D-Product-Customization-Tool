@@ -55,14 +55,25 @@ app.post('/api/designs', (req, res) => {
 
 // Delete a design
 app.delete('/api/designs/:id', (req, res) => {
+  const { id } = req.params;
+  console.log(`🗑️ Attempting to delete design ID: ${id}`);
+  
   try {
-    const { id } = req.params;
     const designs = readData();
+    const initialCount = designs.length;
     const updatedDesigns = designs.filter(d => d.id !== id);
+    
+    if (updatedDesigns.length === initialCount) {
+      console.log(`⚠️ No design found with ID: ${id}`);
+      return res.status(404).json({ error: 'Design not found' });
+    }
+
     writeData(updatedDesigns);
+    console.log(`✅ Successfully deleted design ID: ${id}`);
     res.json({ message: 'Design deleted' });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete design' });
+    console.error('❌ Error during deletion:', error);
+    res.status(500).json({ error: 'Failed to delete design: ' + error.message });
   }
 });
 

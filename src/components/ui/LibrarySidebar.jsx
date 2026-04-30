@@ -42,6 +42,7 @@ export const LibrarySidebar = () => {
       queryClient.invalidateQueries({ queryKey: ['designs'] })
     },
     onError: (error) => {
+      console.error('Delete mutation failed:', error);
       toast.error('Error deleting: ' + error.message)
     }
   })
