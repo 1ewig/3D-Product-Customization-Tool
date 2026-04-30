@@ -22,8 +22,11 @@ export const LogoControls = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0]
     if (file) {
-      const url = URL.createObjectURL(file)
-      setLogoUrl(url)
+      const reader = new FileReader()
+      reader.onload = () => {
+        setLogoUrl(reader.result)
+      }
+      reader.readAsDataURL(file)
       e.target.value = ''
     }
   }

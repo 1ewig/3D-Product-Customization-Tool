@@ -1,29 +1,30 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import defaultLogo from '../assets/default-logo.png'
 
 export const useCustomizationStore = create(
   persist(
     (set) => ({
   // Text State
-  textContent: '',
+  textContent: 'CHAMPRO',
   textColor: '#000000',
   fontSize: 48,
-  textPosition: { x: 0, y: 0, z: 0.3 },
+  textPosition: { x: 0, y: 0.15, z: 0.35 },
   textRotation: 0,
   textScale: 1,
 
   // Logo State
-  logoUrl: null,
-  logoPosition: { x: 0, y: 0, z: 0.31 },
+  logoUrl: defaultLogo,
+  logoPosition: { x: 0, y: -0.1, z: 0.36 },
   logoRotation: 0,
-  logoScale: 1,
+  logoScale: 0.6,
 
   // Interaction State
   // null | 'text' | 'logo'
   selectedObject: null,
   // 'translate' | 'rotate' | 'scale'
   transformMode: 'translate',
-  // 'text' | 'image'
+  // 'text' | 'image' | 'library'
   activeTab: 'text',
 
   // Setters
@@ -42,20 +43,20 @@ export const useCustomizationStore = create(
   setActiveTab: (activeTab) => set({ activeTab }),
 
   resetText: () => set({
-    textContent: '',
+    textContent: 'CHAMPRO',
     textColor: '#000000',
     fontSize: 48,
-    textPosition: { x: 0, y: 0, z: 0.3 },
+    textPosition: { x: 0, y: 0.15, z: 0.35 },
     textRotation: 0,
     textScale: 1,
     selectedObject: null
   }),
 
   resetLogo: () => set({
-    logoUrl: null,
-    logoPosition: { x: 0, y: 0, z: 0.31 },
+    logoUrl: defaultLogo,
+    logoPosition: { x: 0, y: -0.1, z: 0.36 },
     logoRotation: 0,
-    logoScale: 1,
+    logoScale: 0.6,
     selectedObject: null
   }),
 }), { name: 'product-customization-storage' }))
