@@ -53,6 +53,19 @@ app.post('/api/designs', (req, res) => {
   }
 });
 
+// Delete a design
+app.delete('/api/designs/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const designs = readData();
+    const updatedDesigns = designs.filter(d => d.id !== id);
+    writeData(updatedDesigns);
+    res.json({ message: 'Design deleted' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete design' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
