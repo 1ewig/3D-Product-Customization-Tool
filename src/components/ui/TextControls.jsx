@@ -1,4 +1,5 @@
 import { useCustomizationStore } from '../../store/useCustomizationStore'
+import { LogoControls } from './LogoControls'
 
 export const TextControls = () => {
   const {
@@ -36,9 +37,19 @@ export const TextControls = () => {
   }
 
   const labelStyle = {
-    marginBottom: '8px',
     fontSize: '14px',
     fontWeight: 'bold'
+  }
+
+  const resetButtonStyle = {
+    background: '#444',
+    color: '#ccc',
+    border: 'none',
+    borderRadius: '3px',
+    fontSize: '10px',
+    padding: '2px 6px',
+    cursor: 'pointer',
+    marginLeft: 'auto'
   }
 
   return (
@@ -46,7 +57,10 @@ export const TextControls = () => {
       <h2 style={{ marginTop: 0, borderBottom: '1px solid #333', paddingBottom: '12px' }}>Text Overlay</h2>
 
       <div style={controlStyle}>
-        <label style={labelStyle}>Text Input</label>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+          <label style={labelStyle}>Text Input</label>
+          <button style={resetButtonStyle} onClick={() => setTextContent('')}>Reset</button>
+        </div>
         <input 
           type="text" 
           value={textContent} 
@@ -56,7 +70,10 @@ export const TextControls = () => {
       </div>
 
       <div style={controlStyle}>
-        <label style={labelStyle}>Color</label>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+          <label style={labelStyle}>Color</label>
+          <button style={resetButtonStyle} onClick={() => setTextColor('#ffffff')}>Reset</button>
+        </div>
         <input 
           type="color" 
           value={textColor} 
@@ -66,7 +83,10 @@ export const TextControls = () => {
       </div>
 
       <div style={controlStyle}>
-        <label style={labelStyle}>Font Size: {fontSize}</label>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+          <label style={labelStyle}>Font Size: {fontSize}</label>
+          <button style={resetButtonStyle} onClick={() => setFontSize(48)}>Reset</button>
+        </div>
         <input 
           type="number" 
           min="12" 
@@ -78,7 +98,10 @@ export const TextControls = () => {
       </div>
 
       <div style={controlStyle}>
-        <label style={labelStyle}>X Position: {textPosition.x}</label>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+          <label style={labelStyle}>X Position: {textPosition.x}</label>
+          <button style={resetButtonStyle} onClick={() => setTextPosition({ ...textPosition, x: 0 })}>Reset</button>
+        </div>
         <input 
           type="range" 
           min="-1" 
@@ -91,7 +114,10 @@ export const TextControls = () => {
       </div>
 
       <div style={controlStyle}>
-        <label style={labelStyle}>Y Position: {textPosition.y}</label>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+          <label style={labelStyle}>Y Position: {textPosition.y}</label>
+          <button style={resetButtonStyle} onClick={() => setTextPosition({ ...textPosition, y: 0 })}>Reset</button>
+        </div>
         <input 
           type="range" 
           min="-1" 
@@ -104,7 +130,10 @@ export const TextControls = () => {
       </div>
 
       <div style={controlStyle}>
-        <label style={labelStyle}>Rotation: {textRotation}</label>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+          <label style={labelStyle}>Rotation: {textRotation}</label>
+          <button style={resetButtonStyle} onClick={() => setTextRotation(0)}>Reset</button>
+        </div>
         <input 
           type="range" 
           min="-3.14" 
@@ -117,7 +146,10 @@ export const TextControls = () => {
       </div>
 
       <div style={controlStyle}>
-        <label style={labelStyle}>Scale: {textScale}</label>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+          <label style={labelStyle}>Scale: {textScale}</label>
+          <button style={resetButtonStyle} onClick={() => setTextScale(1)}>Reset</button>
+        </div>
         <input 
           type="range" 
           min="0.1" 
@@ -128,6 +160,7 @@ export const TextControls = () => {
           style={{ width: '100%' }}
         />
       </div>
+      <LogoControls />
     </div>
   )
 }

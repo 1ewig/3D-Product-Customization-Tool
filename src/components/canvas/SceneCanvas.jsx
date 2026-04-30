@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Center, PerspectiveCamera } from '@react-three/drei'
 import { ShirtModel } from './ShirtModel'
 import { TextOverlay } from './TextOverlay'
+import { LogoOverlay } from './LogoOverlay'
 
 export const SceneCanvas = () => {
   return (
@@ -22,6 +23,7 @@ export const SceneCanvas = () => {
           <ShirtModel />
         </Center>
         <TextOverlay />
+        <LogoOverlay />
       </Suspense>
     </Canvas>
   )
