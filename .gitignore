@@ -25,3 +25,6 @@ dist-ssr
 
 # Project notes
 *.txt
+
+# Local Database
+server/designs.json
