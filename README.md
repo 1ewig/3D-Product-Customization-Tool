@@ -27,10 +27,11 @@ https://3-d-product-customization-tool.vercel.app/
 ---
 
 ## ✨ Features
-- **3D Clothing Model**: Loading and rendering of GLB clothing models.
+- **Multi-Model Support**: Switch between multiple 3D product models (Draft, Standard, High-Detail) in real-time.
 - **Dynamic Text Overlay**: Full control over text content, color, font size, and 3D transformation.
 - **Logo/Image Upload**: Support for PNG/JPG uploads with automatic Base64 encoding for persistence.
 - **Interactive Gizmos**: Real-time manipulation of overlays using 3D transform controls (Translate, Rotate, Scale).
+- **Download Snapshot**: Export the current 3D design as a high-quality PNG image directly from the browser.
 - **Saved Library**: Persistent "Design Library" to save, load, and manage your custom creations.
 - **Vercel Optimized**: Fully configured for serverless deployment with persistent database storage.
 

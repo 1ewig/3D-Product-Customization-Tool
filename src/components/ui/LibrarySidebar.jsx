@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast'
 
 export const LibrarySidebar = () => {
   const { 
+    setCustomModelUrl,
     setTextContent,
     setTextColor,
     setFontSize,
@@ -59,6 +60,13 @@ export const LibrarySidebar = () => {
     setLogoPosition(design.logo.logoPosition)
     setLogoRotation(design.logo.logoRotation)
     setLogoScale(design.logo.logoScale)
+
+    // Apply model if it was saved in this design payload
+    if (design.model) {
+      setCustomModelUrl(design.model.customModelUrl || null)
+    } else {
+      setCustomModelUrl(null)
+    }
     
     toast.success('Design loaded from library', { icon: '🎨' })
   }

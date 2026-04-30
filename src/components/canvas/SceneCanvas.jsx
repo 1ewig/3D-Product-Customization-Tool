@@ -91,7 +91,7 @@ export const SceneCanvas = () => {
     <>
       <Canvas
         style={{ width: '100%', height: '100vh' }}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
         onPointerMissed={handleCanvasPointerMissed}
       >
         {/* Camera and Lighting */}

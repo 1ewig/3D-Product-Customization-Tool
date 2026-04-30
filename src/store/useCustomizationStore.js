@@ -12,6 +12,9 @@ import defaultLogo from '../assets/default-logo.png'
 export const useCustomizationStore = create(
   persist(
     (set) => ({
+      // ─── PRODUCT / MODEL STATE ─────────────────────────────────────────────
+      customModelUrl: null,               // URL or Base64 of a user-uploaded GLB model
+
       // ─── TEXT STATE ────────────────────────────────────────────────────────
       textContent: 'CHAMPRO',              // Current text content
       textColor: '#000000',               // Hex color of the text
@@ -32,6 +35,8 @@ export const useCustomizationStore = create(
       activeTab: 'text',                  // Active sidebar tab ('text' | 'image' | 'library')
 
       // ─── SETTERS ───────────────────────────────────────────────────────────
+      setCustomModelUrl: (customModelUrl) => set({ customModelUrl }),
+      
       setTextContent: (textContent) => set({ textContent }),
       setTextColor: (textColor) => set({ textColor }),
       setFontSize: (fontSize) => set({ fontSize }),
@@ -72,6 +77,13 @@ export const useCustomizationStore = create(
         logoRotation: 0,
         logoScale: 0.6,
         selectedObject: null
+      }),
+
+      /**
+       * Clears custom model and returns to default.
+       */
+      resetModel: () => set({
+        customModelUrl: null
       }),
     }), 
     { 

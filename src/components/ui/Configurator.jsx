@@ -4,6 +4,7 @@
  * It also handles the API mutation for saving designs to the backend.
  */
 
+import { useRef } from 'react'
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 import { TextControls } from './TextControls'
 import { LogoControls } from './LogoControls'
@@ -12,8 +13,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
 export const Configurator = () => {
-  // Extract all necessary state and setters from the global store
+  const modelInputRef = useRef()
   const { 
+    customModelUrl,
+    setCustomModelUrl,
     activeTab, 
     setActiveTab,
     textContent,
@@ -31,10 +34,6 @@ export const Configurator = () => {
   const queryClient = useQueryClient()
 
   // ─── API MUTATION ──────────────────────────────────────────────────────────
-  /**
-   * Mutation to save the current design state to the Express/Vercel backend.
-   * This sends both text properties and the Base64 logo data.
-   */
   const saveMutation = useMutation({
     mutationFn: async (designData) => {
       const response = await fetch('/api/designs', {
@@ -47,7 +46,6 @@ export const Configurator = () => {
     },
     onSuccess: () => {
       toast.success('Design saved to server!', { icon: '✨' })
-      // Refresh the library data automatically
       queryClient.invalidateQueries({ queryKey: ['designs'] })
     },
     onError: (error) => {
@@ -55,20 +53,46 @@ export const Configurator = () => {
     }
   })
 
-  /**
-   * Bundles the current store state into a design object for saving.
-   */
   const handleSave = () => {
     const designData = {
       text: { textContent, textColor, fontSize, textPosition, textRotation, textScale },
-      logo: { logoUrl, logoPosition, logoRotation, logoScale }
+      logo: { logoUrl, logoPosition, logoRotation, logoScale },
+      model: { customModelUrl }
     }
     saveMutation.mutate(designData)
   }
 
+  const handleDownload = () => {
+    const canvas = document.querySelector('canvas')
+    if (canvas) {
+      const dataUrl = canvas.toDataURL('image/png')
+      const link = document.createElement('a')
+      link.download = `custom-design-${Date.now()}.png`
+      link.href = dataUrl
+      link.click()
+      toast.success('Snapshot downloaded!', { icon: '📸' })
+    }
+  }
+
+  const handleModelUpload = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      if (!file.name.endsWith('.glb')) {
+        toast.error('Please upload a .glb file')
+        return
+      }
+      
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setCustomModelUrl(reader.result)
+        toast.success('Custom model imported!', { icon: '📦' })
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   return (
     <div className="glass-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* ── Tab Navigation ── */}
       <div className="tab-container">
         <button 
           className={`tab-item ${activeTab === 'text' ? 'active text' : ''}`}
@@ -103,22 +127,46 @@ export const Configurator = () => {
         </button>
       </div>
 
-      {/* ── Main Control Content ── */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
         {activeTab === 'text' && <TextControls />}
         {activeTab === 'image' && <LogoControls />}
         {activeTab === 'library' && <LibrarySidebar />}
       </div>
 
-      {/* ── Footer / Save Action ── */}
-      <div style={{ padding: '16px', borderTop: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.1)' }}>
+      {/* ── Footer / Actions ── */}
+      <div style={{ padding: '16px', borderTop: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <input 
+          type="file" 
+          accept=".glb" 
+          style={{ display: 'none' }} 
+          ref={modelInputRef}
+          onChange={handleModelUpload}
+        />
+        
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button 
+            className="btn-select" 
+            style={{ flex: 1, padding: '10px', fontSize: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', color: 'white' }}
+            onClick={() => modelInputRef.current.click()}
+          >
+            Import GLB
+          </button>
+          <button 
+            className="btn-select" 
+            style={{ flex: 1, padding: '10px', fontSize: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', color: 'white' }}
+            onClick={handleDownload}
+          >
+            Download
+          </button>
+        </div>
+
         <button 
           className="btn-select active text" 
           style={{ width: '100%', padding: '12px', fontSize: '0.9rem' }}
           onClick={handleSave}
           disabled={saveMutation.isPending}
         >
-          {saveMutation.isPending ? 'Saving...' : 'Save Design to Server'}
+          {saveMutation.isPending ? 'Saving...' : 'Save Design'}
         </button>
       </div>
     </div>

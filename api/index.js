@@ -25,7 +25,7 @@ const KV_KEY = 'product_designs';                  // Redis key for Vercel KV
 
 // Middleware setup
 app.use(cors());
-app.use(express.json({ limit: '10mb' })); // Higher limit to support Base64 image strings
+app.use(express.json({ limit: '50mb' })); // Higher limit to support Base64 image and model strings
 
 /**
  * Reads design data from the best available storage source.
