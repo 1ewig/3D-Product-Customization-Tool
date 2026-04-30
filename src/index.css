@@ -97,6 +97,12 @@ body {
   z-index: 10;
 }
 
+.library-container {
+  width: 280px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
 /* Section Headers */
 .section-header {
   font-size: 1.1rem;
