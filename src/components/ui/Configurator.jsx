@@ -41,7 +41,12 @@ export const Configurator = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(designData),
       })
-      if (!response.ok) throw new Error('Failed to save')
+      if (!response.ok) {
+        if (response.status === 413) {
+          throw new Error('Design is too large to save on Vercel (Max 4.5MB). Try a smaller 3D model.')
+        }
+        throw new Error('Failed to save')
+      }
       return response.json()
     },
     onSuccess: () => {
@@ -49,7 +54,7 @@ export const Configurator = () => {
       queryClient.invalidateQueries({ queryKey: ['designs'] })
     },
     onError: (error) => {
-      toast.error('Failed to save design: ' + error.message)
+      toast.error(error.message)
     }
   })
 
@@ -81,7 +86,9 @@ export const Configurator = () => {
         toast.error('Please upload a .glb file')
         return
       }
-      
+
+      // We convert to Base64 so the model is actually part of the design data.
+      // This allows the model to "load" from the design library.
       const reader = new FileReader()
       reader.onloadend = () => {
         setCustomModelUrl(reader.result)

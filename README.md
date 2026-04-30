@@ -69,7 +69,7 @@ I chose **Zustand** for its lightweight nature and built-in persistence middlewa
 
 ### 1. Clone the repository
 ```bash
-git clone [your-repo-link]
+git clone https://github.com/1ewig/3D-Product-Customization-Tool
 cd 3D-Product-Customization-Tool
 ```
 
@@ -79,19 +79,22 @@ npm install
 ```
 
 ### 3. Run Locally
-You will need two terminals open:
+The project uses a hybrid architecture. You need to run both the frontend and the backend API for the Library features to work locally.
 
 **Terminal 1 (Backend API):**
+Runs an Express server that handles design persistence. Locally, it saves data to a temporary JSON file.
 ```bash
 npm run server
 ```
 
 **Terminal 2 (Frontend):**
+Runs the Vite development server with a proxy configured to communicate with the local backend.
 ```bash
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173`.
+The app will be available at `http://localhost:5173`. 
+*Note: In local development, designs are saved to `/tmp/designs.json`.*
 
 ---
 
