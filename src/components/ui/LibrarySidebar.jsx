@@ -22,7 +22,7 @@ export const LibrarySidebar = () => {
   const { data: designs, isLoading } = useQuery({
     queryKey: ['designs'],
     queryFn: async () => {
-      const response = await fetch('http://localhost:5000/api/designs')
+      const response = await fetch('/api/designs')
       if (!response.ok) throw new Error('Failed to load')
       return response.json()
     }
@@ -31,7 +31,7 @@ export const LibrarySidebar = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
-      const response = await fetch(`http://localhost:5000/api/designs/${id}`, {
+      const response = await fetch(`/api/designs/${id}`, {
         method: 'DELETE',
       })
       if (!response.ok) throw new Error('Failed to delete')

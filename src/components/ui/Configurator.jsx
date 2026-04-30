@@ -35,7 +35,7 @@ export const Configurator = () => {
 
   const saveMutation = useMutation({
     mutationFn: async (designData) => {
-      const response = await fetch('http://localhost:5000/api/designs', {
+      const response = await fetch('/api/designs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(designData),

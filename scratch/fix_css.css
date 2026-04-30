@@ -1,0 +1,6 @@
+.ui-container {
+  width: 340px;
+  max-width: 90vw;
+  flex-shrink: 0;
+  z-index: 10;
+}
