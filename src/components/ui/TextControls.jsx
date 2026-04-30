@@ -1,5 +1,4 @@
 import { useCustomizationStore } from '../../store/useCustomizationStore'
-import { LogoControls } from './LogoControls'
 
 export const TextControls = () => {
   const {
@@ -164,8 +163,6 @@ export const TextControls = () => {
           onChange={(e) => setTextScale(parseFloat(e.target.value))}
         />
       </div>
-
-      <LogoControls />
     </div>
   )
 }

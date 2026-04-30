@@ -1,6 +1,6 @@
 import './App.css'
 import { SceneCanvas } from './components/canvas/SceneCanvas'
-import { TextControls } from './components/ui/TextControls'
+import { Configurator } from './components/ui/Configurator'
 
 function App() {
   return (
@@ -8,8 +8,8 @@ function App() {
       <div className="canvas-container">
         <SceneCanvas />
       </div>
-      <div className="ui-container glass-panel">
-        <TextControls />
+      <div className="ui-container">
+        <Configurator />
       </div>
     </div>
   )

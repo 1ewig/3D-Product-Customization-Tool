@@ -20,6 +20,8 @@ export const useCustomizationStore = create((set) => ({
   selectedObject: null,
   // 'translate' | 'rotate' | 'scale'
   transformMode: 'translate',
+  // 'text' | 'image'
+  activeTab: 'text',
 
   // Setters
   setTextContent: (textContent) => set({ textContent }),
@@ -34,6 +36,7 @@ export const useCustomizationStore = create((set) => ({
   setLogoScale: (logoScale) => set({ logoScale }),
   setSelectedObject: (selectedObject) => set({ selectedObject }),
   setTransformMode: (transformMode) => set({ transformMode }),
+  setActiveTab: (activeTab) => set({ activeTab }),
 
   resetText: () => set({
     textContent: '',

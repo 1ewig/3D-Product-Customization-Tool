@@ -343,3 +343,50 @@ body {
   background: var(--glass-border);
   align-self: center;
 }
+
+/* Sidebar Tabs */
+.tab-container {
+  display: flex;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.tab-item {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tab-item:hover:not(.active) {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-item.active {
+  color: var(--text-main);
+  background: var(--input-bg);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.tab-item.active.text {
+  border-bottom: 2px solid var(--accent-blue);
+}
+
+.tab-item.active.image {
+  border-bottom: 2px solid var(--accent-green);
+}
