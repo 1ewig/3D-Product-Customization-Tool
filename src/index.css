@@ -401,3 +401,63 @@ body {
 .tab-item.active.library {
   border-bottom: 2px solid var(--accent-blue); /* Or a different color if preferred */
 }
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .canvas-container {
+    height: 45vh;
+    flex: none;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .ui-container {
+    width: 100%;
+    max-width: 100%;
+    height: 55vh;
+    flex: 1;
+  }
+
+  .glass-panel {
+    border-left: none;
+    /* Optional: add a subtle indicator that this is a bottom panel */
+    border-top: 1px solid var(--glass-border);
+  }
+
+  .viewport-toolbar {
+    bottom: 12px;
+    padding: 6px 12px;
+    gap: 8px;
+  }
+
+  .toolbar-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .section-header {
+    font-size: 1rem;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+  }
+
+  .control-group {
+    margin-bottom: 16px;
+  }
+
+  /* Make tabs more compact on small screens */
+  .tab-item {
+    padding: 10px 4px;
+    font-size: 0.7rem;
+    gap: 4px;
+  }
+
+  .tab-item svg {
+    width: 14px;
+    height: 14px;
+  }
+}
