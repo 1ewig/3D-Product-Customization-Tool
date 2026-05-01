@@ -6,15 +6,12 @@ import { Toaster } from 'react-hot-toast'
 function App() {
   return (
     <div className="app-layout">
-      <Toaster position="bottom-center" toastOptions={{
-        style: {
-          background: 'var(--bg-dark)',
-          color: 'var(--text-main)',
-          border: '1px solid var(--glass-border)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: '12px',
-        },
-      }} />
+      <Toaster 
+        position="bottom-center" 
+        toastOptions={{
+          className: 'premium-toast',
+        }} 
+      />
       <div className="canvas-container">
         <SceneCanvas />
       </div>
