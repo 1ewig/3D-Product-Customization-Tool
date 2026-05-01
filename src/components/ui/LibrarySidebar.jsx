@@ -86,7 +86,7 @@ export const LibrarySidebar = memo(() => {
 
   return (
     <div className="library-content-area">
-      <div className="section-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="section-header">
         <span>Saved Library</span>
         <button className="btn-reset" onClick={() => queryClient.invalidateQueries({ queryKey: ['designs'] })}>
           Refresh
@@ -94,26 +94,17 @@ export const LibrarySidebar = memo(() => {
       </div>
 
       {isLoading ? (
-        <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Loading library...</div>
+        <div className="text-muted-sm">Loading library...</div>
       ) : designs?.length > 0 ? (
-        <div style={{ display: 'grid', gap: '10px' }}>
+        <div className="library-grid">
           {designs.map((design) => (
-            <div key={design.id} style={{ position: 'relative', display: 'flex', gap: '8px' }}>
+            <div key={design.id} className="library-item">
               <button
                 onClick={() => handleLoadDesign(design.id)}
-                className="premium-input"
-
-                style={{ 
-                  flex: 1,
-                  textAlign: 'left', 
-                  fontSize: '0.8rem', 
-                  padding: '12px', 
-                  cursor: 'pointer',
-                  background: 'rgba(255,255,255,0.02)'
-                }}
+                className="premium-input library-btn"
               >
-                <div style={{ fontWeight: '600', color: 'var(--text-main)', marginBottom: '4px' }}>Design #{design.id.slice(-4)}</div>
-                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+                <div className="library-btn-title">Design #{design.id.slice(-4)}</div>
+                <div className="library-btn-meta">
                   {new Date(design.createdAt).toLocaleDateString()}
                 </div>
               </button>
@@ -122,14 +113,7 @@ export const LibrarySidebar = memo(() => {
                   e.stopPropagation();
                   if(confirm('Are you sure you want to delete this design?')) deleteMutation.mutate(design.id);
                 }}
-                className="toolbar-btn"
-                style={{ 
-                  marginTop: 'auto', 
-                  marginBottom: 'auto', 
-                  background: 'rgba(239, 68, 68, 0.1)', 
-                  color: '#ef4444',
-                  border: '1px solid rgba(239, 68, 68, 0.2)'
-                }}
+                className="toolbar-btn btn-delete-item"
                 title="Delete Design"
               >
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -141,7 +125,7 @@ export const LibrarySidebar = memo(() => {
           ))}
         </div>
       ) : (
-        <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontStyle: 'italic' }}>
+        <div className="text-muted-sm italic">
           No designs saved yet.
         </div>
       )}

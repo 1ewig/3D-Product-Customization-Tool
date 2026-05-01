@@ -103,7 +103,7 @@ export const Configurator = () => {
   }
 
   return (
-    <div className="glass-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div className="glass-panel h-full flex-column">
       <div className="tab-container">
         <button 
           className={`tab-item ${activeTab === 'text' ? 'active text' : ''}`}
@@ -138,33 +138,31 @@ export const Configurator = () => {
         </button>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+      <div className="flex-1 overflow-y-auto p-24">
         {activeTab === 'text' && <TextControls />}
         {activeTab === 'image' && <LogoControls />}
         {activeTab === 'library' && <LibrarySidebar />}
       </div>
 
       {/* ── Footer / Actions ── */}
-      <div style={{ padding: '16px', borderTop: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div className="configurator-footer">
         <input 
           type="file" 
           accept=".glb" 
-          style={{ display: 'none' }} 
+          className="d-none" 
           ref={modelInputRef}
           onChange={handleModelUpload}
         />
         
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="flex-row gap-8">
           <button 
-            className="btn-select" 
-            style={{ flex: 1, padding: '10px', fontSize: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', color: 'white' }}
+            className="btn-select btn-secondary m-0" 
             onClick={() => modelInputRef.current.click()}
           >
             Import GLB
           </button>
           <button 
-            className="btn-select" 
-            style={{ flex: 1, padding: '10px', fontSize: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', color: 'white' }}
+            className="btn-select btn-secondary m-0" 
             onClick={handleDownload}
           >
             Download
@@ -172,8 +170,7 @@ export const Configurator = () => {
         </div>
 
         <button 
-          className="btn-select active text" 
-          style={{ width: '100%', padding: '12px', fontSize: '0.9rem' }}
+          className="btn-select active text btn-primary-large m-0" 
           onClick={handleSave}
           disabled={saveMutation.isPending}
         >

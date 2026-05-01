@@ -37,7 +37,7 @@ export const LogoControls = memo(() => {
 
   return (
     <div>
-      <div className="section-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="section-header">
         <span>Logo / Image</span>
         <button className="btn-reset" onClick={resetLogo} title="Reset All Logo Properties">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -49,25 +49,23 @@ export const LogoControls = memo(() => {
 
       {/* ── Upload ── */}
       <div className="control-group">
-        <label className="control-label" style={{ marginBottom: '8px', display: 'block' }}>Upload Image</label>
+        <label className="control-label mb-8 d-block">Upload Image</label>
         <input
           type="file"
           accept="image/png, image/jpeg"
           onChange={handleImageUpload}
-          className="premium-input"
-          style={{ padding: '8px' }}
+          className="premium-input p-8"
         />
         {logoUrl && (
-          <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--input-bg)', padding: '8px', borderRadius: '8px', border: '1px solid var(--input-border)' }}>
+          <div className="logo-preview-container">
             <img
               src={logoUrl}
               alt="Logo preview"
-              style={{ maxWidth: '48px', maxHeight: '48px', display: 'block', borderRadius: '4px' }}
+              className="logo-preview-img"
             />
             <button
               onClick={() => { setLogoUrl(null); setSelectedObject(null) }}
-              className="btn-reset"
-              style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)', marginLeft: 'auto' }}
+              className="btn-reset text-danger border-danger-subtle ml-auto"
             >
               Remove
             </button>

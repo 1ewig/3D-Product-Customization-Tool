@@ -90,7 +90,7 @@ export const SceneCanvas = () => {
   return (
     <>
       <Canvas
-        style={{ width: '100%', height: '100%' }}
+        className="w-full h-full"
         gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
         onPointerMissed={handleCanvasPointerMissed}
       >
