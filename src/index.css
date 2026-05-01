@@ -410,7 +410,7 @@ body {
   }
 
   .canvas-container {
-    height: 45vh;
+    height: 60vh;
     flex: none;
     border-bottom: 1px solid var(--glass-border);
   }
@@ -418,7 +418,7 @@ body {
   .ui-container {
     width: 100%;
     max-width: 100%;
-    height: 55vh;
+    height: 40vh;
     flex: 1;
   }
 
