@@ -4,34 +4,54 @@
  * Uses a 2D Canvas to generate the text texture in real-time.
  */
 
-import { useMemo, forwardRef } from 'react'
+import { useMemo, forwardRef, useEffect, useRef, memo, useState } from 'react'
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 import { createTextTexture } from '../../utils/createTextTexture'
 
 // ForwardRef allows the parent (SceneCanvas) to attach TransformControls to this mesh
-export const TextOverlay = forwardRef(function TextOverlay(_, ref) {
-  // Extract state from global store
-  const {
-    textContent,
-    textColor,
-    fontSize,
-    textPosition,
-    textRotation,
-    textScale,
-  } = useCustomizationStore()
+export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
+  // ─── SELECTIVE SUBSCRIPTIONS ───────────────────────────────────────────────
+  const textContent = useCustomizationStore(state => state.textContent)
+  const textColor = useCustomizationStore(state => state.textColor)
+  const fontSize = useCustomizationStore(state => state.fontSize)
+  const textPosition = useCustomizationStore(state => state.textPosition)
+  const textRotation = useCustomizationStore(state => state.textRotation)
+  const textScale = useCustomizationStore(state => state.textScale)
+
+  // We use state for the texture itself so that the initial creation triggers a re-render.
+  // Subsequent updates will mutate the texture in-place for performance.
+  const [texture, setTexture] = useState(null)
+  const canvasRef = useRef(null)
 
   /**
-   * Generates a Three.js CanvasTexture containing the rendered text.
-   * Only updates when content, color, or font size changes.
+   * Initializes and updates the texture without creating new objects.
    */
-  const texture = useMemo(() => {
-    if (!textContent) return null
-    const tex = createTextTexture(textContent, fontSize, textColor)
-    tex.needsUpdate = true
-    return tex
-  }, [textContent, textColor, fontSize])
+  useEffect(() => {
+    if (!textContent) return
 
-  // Hide the overlay if there is no content
+    if (!texture) {
+      // First time creation - triggers state update and re-render
+      const tex = createTextTexture(textContent, fontSize, textColor)
+      canvasRef.current = tex.image
+      setTexture(tex)
+    } else {
+      // Update existing canvas in-place - high performance, no re-render needed
+      // because Three.js monitors 'needsUpdate'
+      createTextTexture(textContent, fontSize, textColor, canvasRef.current)
+      texture.needsUpdate = true
+    }
+  }, [textContent, textColor, fontSize, texture])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (texture) {
+        texture.dispose()
+      }
+    }
+  }, [texture])
+
+  // Hide the overlay if there is no content or texture is not yet ready
   if (!textContent || !texture) return null
 
   return (
@@ -45,10 +65,12 @@ export const TextOverlay = forwardRef(function TextOverlay(_, ref) {
       <meshBasicMaterial
         map={texture}
         transparent={true}
-        depthWrite={false} // Prevents "box" outline artifacts on the model
-        polygonOffset={true} // Z-fighting prevention
-        polygonOffsetFactor={-1} // Moves the overlay slightly "forward" in the depth buffer
+        depthWrite={false}
+        polygonOffset={true}
+        polygonOffsetFactor={-1}
       />
     </mesh>
   )
-})
+}))
+
+

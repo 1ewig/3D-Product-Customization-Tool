@@ -1,21 +1,25 @@
+import { memo } from 'react'
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 
-export const LogoControls = () => {
-  const {
-    logoUrl,
-    logoPosition,
-    logoRotation,
-    logoScale,
-    selectedObject,
-    transformMode,
-    setLogoUrl,
-    setLogoPosition,
-    setLogoRotation,
-    setLogoScale,
-    setSelectedObject,
-    setTransformMode,
-    resetLogo,
-  } = useCustomizationStore()
+export const LogoControls = memo(() => {
+  // ─── SELECTIVE SUBSCRIPTIONS ───────────────────────────────────────────────
+  // We extract exactly what we need. This prevents the entire UI from 
+  // re-rendering when unrelated store values (like text content) change.
+  const logoUrl = useCustomizationStore(state => state.logoUrl)
+  const logoPosition = useCustomizationStore(state => state.logoPosition)
+  const logoRotation = useCustomizationStore(state => state.logoRotation)
+  const logoScale = useCustomizationStore(state => state.logoScale)
+  const selectedObject = useCustomizationStore(state => state.selectedObject)
+  const transformMode = useCustomizationStore(state => state.transformMode)
+
+  const setLogoUrl = useCustomizationStore(state => state.setLogoUrl)
+  const setLogoPosition = useCustomizationStore(state => state.setLogoPosition)
+  const setLogoRotation = useCustomizationStore(state => state.setLogoRotation)
+  const setLogoScale = useCustomizationStore(state => state.setLogoScale)
+  const setSelectedObject = useCustomizationStore(state => state.setSelectedObject)
+  const setTransformMode = useCustomizationStore(state => state.setTransformMode)
+  const resetLogo = useCustomizationStore(state => state.resetLogo)
+
 
   const isSelected = selectedObject === 'logo'
 
@@ -156,4 +160,5 @@ export const LogoControls = () => {
       </div>
     </div>
   )
-}
+})
+

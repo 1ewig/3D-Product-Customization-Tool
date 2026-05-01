@@ -4,14 +4,18 @@
  * Supports standard URLs and Base64 encoded strings.
  */
 
-import { useState, useEffect, forwardRef } from 'react'
+import { useState, useEffect, forwardRef, memo } from 'react'
 import * as THREE from 'three'
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 
 // ForwardRef allows the parent (SceneCanvas) to attach TransformControls to this mesh
-export const LogoOverlay = forwardRef(function LogoOverlay(_, ref) {
-  // Extract state from global store
-  const { logoUrl, logoPosition, logoRotation, logoScale } = useCustomizationStore()
+export const LogoOverlay = memo(forwardRef(function LogoOverlay(_, ref) {
+  // ─── SELECTIVE SUBSCRIPTIONS ───────────────────────────────────────────────
+  const logoUrl = useCustomizationStore(state => state.logoUrl)
+  const logoPosition = useCustomizationStore(state => state.logoPosition)
+  const logoRotation = useCustomizationStore(state => state.logoRotation)
+  const logoScale = useCustomizationStore(state => state.logoScale)
+  
   const [texture, setTexture] = useState(null)
 
   /**
@@ -28,7 +32,18 @@ export const LogoOverlay = forwardRef(function LogoOverlay(_, ref) {
       loadedTexture.needsUpdate = true
       setTexture(loadedTexture)
     })
+
+    return () => {
+      // Note: We don't dispose here because the next texture is loading
+    }
   }, [logoUrl])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (texture) texture.dispose()
+    }
+  }, [texture])
 
   // Don't render until the texture is fully loaded
   if (!logoUrl || !texture) return null
@@ -44,10 +59,11 @@ export const LogoOverlay = forwardRef(function LogoOverlay(_, ref) {
       <meshBasicMaterial
         map={texture}
         transparent={true}
-        depthWrite={false} // Prevents "box" outline artifacts on the model
-        polygonOffset={true} // Z-fighting prevention
-        polygonOffsetFactor={-1} // Moves the overlay slightly "forward" in the depth buffer
+        depthWrite={false}
+        polygonOffset={true}
+        polygonOffsetFactor={-1}
       />
     </mesh>
   )
-})
+}))
+

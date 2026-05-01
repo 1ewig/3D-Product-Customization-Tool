@@ -1,25 +1,30 @@
+import { memo } from 'react'
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 
-export const TextControls = () => {
-  const {
-    textContent,
-    textColor,
-    fontSize,
-    textPosition,
-    textRotation,
-    textScale,
-    selectedObject,
-    transformMode,
-    setTextContent,
-    setTextColor,
-    setFontSize,
-    setTextPosition,
-    setTextRotation,
-    setTextScale,
-    setSelectedObject,
-    setTransformMode,
-    resetText,
-  } = useCustomizationStore()
+export const TextControls = memo(() => {
+  // ─── SELECTIVE SUBSCRIPTIONS ───────────────────────────────────────────────
+
+  // We extract exactly what we need. This prevents the entire UI from 
+  // re-rendering when unrelated store values (like logo position) change.
+  const textContent = useCustomizationStore(state => state.textContent)
+  const textColor = useCustomizationStore(state => state.textColor)
+  const fontSize = useCustomizationStore(state => state.fontSize)
+  const textPosition = useCustomizationStore(state => state.textPosition)
+  const textRotation = useCustomizationStore(state => state.textRotation)
+  const textScale = useCustomizationStore(state => state.textScale)
+  const selectedObject = useCustomizationStore(state => state.selectedObject)
+  const transformMode = useCustomizationStore(state => state.transformMode)
+  
+  const setTextContent = useCustomizationStore(state => state.setTextContent)
+  const setTextColor = useCustomizationStore(state => state.setTextColor)
+  const setFontSize = useCustomizationStore(state => state.setFontSize)
+  const setTextPosition = useCustomizationStore(state => state.setTextPosition)
+  const setTextRotation = useCustomizationStore(state => state.setTextRotation)
+  const setTextScale = useCustomizationStore(state => state.setTextScale)
+  const setSelectedObject = useCustomizationStore(state => state.setSelectedObject)
+  const setTransformMode = useCustomizationStore(state => state.setTransformMode)
+  const resetText = useCustomizationStore(state => state.resetText)
+
 
   const isSelected = selectedObject === 'text'
 
@@ -165,4 +170,5 @@ export const TextControls = () => {
       </div>
     </div>
   )
-}
+})
+

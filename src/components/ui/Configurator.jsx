@@ -14,22 +14,26 @@ import { toast } from 'react-hot-toast'
 
 export const Configurator = () => {
   const modelInputRef = useRef()
-  const { 
-    customModelUrl,
-    setCustomModelUrl,
-    activeTab, 
-    setActiveTab,
-    textContent,
-    textColor,
-    fontSize,
-    textPosition,
-    textRotation,
-    textScale,
-    logoUrl,
-    logoPosition,
-    logoRotation,
-    logoScale,
-  } = useCustomizationStore()
+  // ─── SELECTIVE SUBSCRIPTIONS ───────────────────────────────────────────────
+
+  const customModelUrl = useCustomizationStore(state => state.customModelUrl)
+  const setCustomModelUrl = useCustomizationStore(state => state.setCustomModelUrl)
+  const activeTab = useCustomizationStore(state => state.activeTab)
+  const setActiveTab = useCustomizationStore(state => state.setActiveTab)
+  
+  // These are needed for the handleSave function
+  const textContent = useCustomizationStore(state => state.textContent)
+  const textColor = useCustomizationStore(state => state.textColor)
+  const fontSize = useCustomizationStore(state => state.fontSize)
+  const textPosition = useCustomizationStore(state => state.textPosition)
+  const textRotation = useCustomizationStore(state => state.textRotation)
+  const textScale = useCustomizationStore(state => state.textScale)
+  
+  const logoUrl = useCustomizationStore(state => state.logoUrl)
+  const logoPosition = useCustomizationStore(state => state.logoPosition)
+  const logoRotation = useCustomizationStore(state => state.logoRotation)
+  const logoScale = useCustomizationStore(state => state.logoScale)
+
 
   const queryClient = useQueryClient()
 

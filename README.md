@@ -15,7 +15,7 @@ https://3-d-product-customization-tool.vercel.app/
 - **React.js**: UI and Component architecture.
 - **Three.js / React Three Fiber**: 3D rendering engine and scene management.
 - **React Three Drei**: Helper components for 3D interactions (OrbitControls, TransformControls, useGLTF).
-- **Zustand**: Global state management with LocalStorage persistence.
+- **Zustand**: Global state management with atomic subscriptions for high performance.
 - **TanStack Query (React Query)**: Server state management and API synchronization.
 - **Vanilla CSS**: Premium glassmorphism UI design.
 
@@ -27,7 +27,7 @@ https://3-d-product-customization-tool.vercel.app/
 ---
 
 ## ✨ Features
-- **Multi-Model Support**: Switch between multiple 3D product models (Draft, Standard, High-Detail) in real-time.
+- **Custom Model Import**: Support for user-uploaded `.glb` models with automatic normalization and centering.
 - **Dynamic Text Overlay**: Full control over text content, color, font size, and 3D transformation.
 - **Logo/Image Upload**: Support for PNG/JPG uploads with automatic Base64 encoding for persistence.
 - **Interactive Gizmos**: Real-time manipulation of overlays using 3D transform controls (Translate, Rotate, Scale).
@@ -46,15 +46,15 @@ To ensure "placement accuracy without distortion" as required by the assessment,
 - **Placement**: Instead of standard decals, I utilized **Floating Plane Meshes** with a calculated **Polygon Offset**. This prevents Z-fighting and ensures the overlays remain visible and sharp against the complex geometry of the clothing model while allowing for pixel-perfect interactive manipulation.
 
 ### 2. Challenges & Solutions
-- **Challenge: Image Persistence on Page Refresh**: 
-  - *Problem*: Using temporary Blob URLs caused images to disappear after a page refresh.
-  - *Solution*: Implemented a `FileReader` logic to convert uploaded files into **Base64 strings**. This allows the actual image data to be stored in the design JSON, making it fully persistent across sessions and database reloads.
-- **Challenge: Ephemeral Filesystem on Vercel**: 
-  - *Problem*: Standard Node.js `fs` operations reset on Vercel serverless functions.
-  - *Solution*: Integrated **Vercel KV (Redis)**. I built a hybrid storage utility that detects the environment and switches from the local filesystem to a cloud Redis store automatically when deployed.
-- **Challenge: Decal Component Instability**:
-  - *Problem*: Initial attempts to use the `@react-three/drei` Decal component resulted in visual glitches (texture flickering) and conflicts with the camera's Raycaster during interactive transformation.
-  - *Solution*: Pivoted to a custom **Mesh Overlay** system using `polygonOffset`. This provided superior stability, guaranteed no Z-fighting, and allowed for more reliable coordinate tracking during real-time dragging.
+- **Challenge: LocalStorage Write Congestion (Performance)**: 
+  - *Problem*: Large designs with Base64 models caused 60fps jitter during slider updates because the store was writing the entire multi-megabyte state to LocalStorage on every frame.
+  - *Solution*: Implemented a **Debounced Persistence Wrapper** for the Zustand storage engine, ensuring disk writes only occur after the user finishes their movement.
+- **Challenge: Rendering Bottleneck with Texture Creation**:
+  - *Problem*: Recreating the 2D Canvas and Texture on every text update was expensive and caused frame drops.
+  - *Solution*: Optimized the system to **reuse the same Canvas and Texture object**, updating the content in-place and using the `needsUpdate` flag for high-speed rendering.
+- **Challenge: Over-Subscription of Global State**:
+  - *Problem*: Components destructing the entire store were re-rendering unnecessarily when unrelated properties changed.
+  - *Solution*: Refactored all components to use **Atomic Selectors**, ensuring a component only re-renders if its specific piece of data changes.
 
 ### 3. State Management Strategy
 I chose **Zustand** for its lightweight nature and built-in persistence middleware. This ensures that even if a user doesn't "Save to Server," their current work-in-progress is saved in their browser's LocalStorage.

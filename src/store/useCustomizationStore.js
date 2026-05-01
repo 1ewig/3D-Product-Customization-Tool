@@ -6,8 +6,27 @@
  */
 
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import defaultLogo from '../assets/default-logo.png'
+
+/**
+ * Custom Debounced Storage Wrapper
+ * Prevents expensive LocalStorage writes on every frame during slider movements.
+ * This is critical when the state contains large Base64 model or image data.
+ */
+const createDebouncedStorage = (storage, wait = 250) => {
+  let timeout
+  return {
+    getItem: (name) => storage.getItem(name),
+    removeItem: (name) => storage.removeItem(name),
+    setItem: (name, value) => {
+      if (timeout) clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        storage.setItem(name, value)
+      }, wait)
+    },
+  }
+}
 
 export const useCustomizationStore = create(
   persist(
@@ -55,9 +74,6 @@ export const useCustomizationStore = create(
 
       // ─── RESET ACTIONS ─────────────────────────────────────────────────────
       
-      /**
-       * Resets text properties to professional default preset.
-       */
       resetText: () => set({
         textContent: 'CHAMPRO',
         textColor: '#000000',
@@ -68,9 +84,6 @@ export const useCustomizationStore = create(
         selectedObject: null
       }),
 
-      /**
-       * Resets logo properties to professional default preset.
-       */
       resetLogo: () => set({
         logoUrl: defaultLogo,
         logoPosition: { x: 0, y: -0.1, z: 0.36 },
@@ -79,15 +92,15 @@ export const useCustomizationStore = create(
         selectedObject: null
       }),
 
-      /**
-       * Clears custom model and returns to default.
-       */
       resetModel: () => set({
         customModelUrl: null
       }),
     }), 
     { 
-      name: 'product-customization-storage' // Key used in LocalStorage
+      name: 'product-customization-storage',
+      // Wrap the standard localStorage with our debouncer
+      storage: createJSONStorage(() => createDebouncedStorage(localStorage, 500))
     }
   )
 )
+

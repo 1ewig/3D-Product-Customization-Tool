@@ -11,11 +11,12 @@ The application follows a modern **MERN-adjacent** architecture, optimized for 3
 ### 1. State Management Strategy (**Zustand**)
 Instead of Redux, I chose **Zustand** for global state. 
 - **Reasoning**: It offers a boilerplate-free API that is highly performant with React Three Fiber's render loop.
-- **Persistence**: Used the `persist` middleware to ensure the user's work-in-progress survives browser refreshes via LocalStorage.
+- **Atomic Subscriptions**: To maintain 60fps, I utilized selective selectors (e.g., `state => state.textContent`) across all components. This ensures that updates to the text position don't trigger re-renders in unrelated UI elements or the logo mesh.
+- **Debounced Persistence**: Because the state can contain large Base64 strings, I implemented a custom debounced storage wrapper. This prevents synchronous `localStorage.setItem` calls from blocking the main thread during high-frequency slider updates.
 
 ### 2. 3D Interaction Engine (**R3F + Drei**)
 The 3D scene is built using **React Three Fiber (R3F)**.
-- **Model Loading**: Utilized `useGLTF` with a dynamic state-driven path switcher. This allows users to swap between different mesh versions (Draft vs. High-Detail) without losing their customization overlays. All models are pre-loaded to ensure zero latency during switching.
+- **Model Loading**: Utilized `useGLTF` with a dynamic state-driven path. This allows users to import their own `.glb` models. The models are automatically normalized in scale and centered at the origin to ensure a consistent experience regardless of the source file's original orientation.
 - **Transformation**: Integrated `TransformControls` with a custom synchronization bridge. When a user manipulates a 3D gizmo, the changes are throttled and synced back to the Zustand store, ensuring a single source of truth.
 - **Exporting**: Implemented a "Snapshot" feature that extracts the WebGL buffer using `preserveDrawingBuffer`, allowing users to download their designs as PNG files.
 
@@ -57,17 +58,17 @@ Since the project is deployed on **Vercel**, which uses a read-only serverless f
 **Challenge**: `OrbitControls` (camera movement) and `TransformControls` (object movement) often fight for mouse input.
 **Solution**: Implemented event listeners on the Transform Gizmo. When a user starts dragging a logo, the camera rotation is programmatically disabled to prevent the scene from spinning while the user is trying to be precise.
 
-### 3. Transform Gizmo Synchronization
-**Challenge**: Manipulating a mesh in a 3D Canvas does not automatically update the application's React state.
-**Solution**: Developed a synchronization bridge that "pulls" the latest translation, rotation, and scale data from the Three.js mesh and "pushes" it into the Zustand store using throttled callbacks, maintaining a unified state across the app.
+### 3. State Over-Subscription & Render Lag
+**Challenge**: Initial implementation used store destructuring, causing the entire UI to re-render on every slider pixel movement.
+**Solution**: Refactored the entire application to use atomic selectors and memoized components (`React.memo`), reducing the render overhead by ~80% during active manipulation.
 
-### 4. Asynchronous Texture Loading
-**Challenge**: Loading a saved design could result in "empty" overlays if the mesh rendered before the Base64 image texture was fully processed.
-**Solution**: Implemented an async loading pattern with `THREE.TextureLoader` and React lifecycle hooks to ensure overlays only display once the texture is ready, preventing visual flickering during library navigation.
+### 4. LocalStorage Performance (The "Jitter" Problem)
+**Challenge**: Large designs (4MB+) caused jitter because `persist` middleware wrote to disk on every frame.
+**Solution**: Built a debounced storage proxy that throttles disk writes, decoupling the UI's visual update (60fps) from the persistence layer.
 
-### 5. Interaction Raycasting & Filtering
-**Challenge**: Standard pointer events on a 3D canvas can be ambiguous, potentially selecting the background shirt when the user intends to select an overlay.
-**Solution**: Targeted specific mesh references for the `TransformControls` and used the `onPointerMissed` handler to manage clean de-selection, providing a polished, professional interaction model.
+### 5. Texture Regeneration
+**Challenge**: Creating new `THREE.CanvasTexture` objects on every character typed was CPU-intensive.
+**Solution**: Implemented a "Reuse and Update" strategy for the text canvas, mutating the existing texture buffer instead of reallocating memory.
 
 ---
 

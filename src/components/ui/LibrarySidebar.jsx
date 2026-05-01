@@ -1,8 +1,9 @@
+import { memo } from 'react'
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-export const LibrarySidebar = () => {
+export const LibrarySidebar = memo(() => {
   const { 
     setCustomModelUrl,
     setTextContent,
@@ -133,4 +134,5 @@ export const LibrarySidebar = () => {
       )}
     </div>
   )
-}
+})
+

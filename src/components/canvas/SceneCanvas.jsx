@@ -24,19 +24,18 @@ export const SceneCanvas = () => {
   const [logoMounted, setLogoMounted] = useState(false)
 
   // ─── STORE STATE ───────────────────────────────────────────────────────────
-  const {
-    selectedObject,
-    setSelectedObject,
-    transformMode,
-    textContent,
-    logoUrl,
-    setTextPosition,
-    setTextRotation,
-    setTextScale,
-    setLogoPosition,
-    setLogoRotation,
-    setLogoScale,
-  } = useCustomizationStore()
+  const selectedObject = useCustomizationStore(state => state.selectedObject)
+  const setSelectedObject = useCustomizationStore(state => state.setSelectedObject)
+  const transformMode = useCustomizationStore(state => state.transformMode)
+  const textContent = useCustomizationStore(state => state.textContent)
+  const logoUrl = useCustomizationStore(state => state.logoUrl)
+  
+  const setTextPosition = useCustomizationStore(state => state.setTextPosition)
+  const setTextRotation = useCustomizationStore(state => state.setTextRotation)
+  const setTextScale = useCustomizationStore(state => state.setTextScale)
+  const setLogoPosition = useCustomizationStore(state => state.setLogoPosition)
+  const setLogoRotation = useCustomizationStore(state => state.setLogoRotation)
+  const setLogoScale = useCustomizationStore(state => state.setLogoScale)
 
   /**
    * Synchronizes the 3D mesh transformation back to the global store.
@@ -55,6 +54,7 @@ export const SceneCanvas = () => {
       setLogoScale(+m.scale.x.toFixed(3))
     }
   }, [selectedObject, setTextPosition, setTextRotation, setTextScale, setLogoPosition, setLogoRotation, setLogoScale])
+
 
   // Disable camera rotation while the user is dragging the gizmo
   const handleDragStart = () => {
