@@ -49,39 +49,29 @@ export const LibrarySidebar = memo(() => {
     }
   })
 
-  const handleLoadDesign = async (id) => {
-    const loadingToast = toast.loading('Fetching design data...')
+  const handleLoadDesign = (design) => {
+    setTextContent(design.text.textContent)
+    setTextColor(design.text.textColor)
+    setFontSize(design.text.fontSize)
+    setTextPosition(design.text.textPosition)
+    setTextRotation(design.text.textRotation)
+    setTextScale(design.text.textScale)
     
-    try {
-      const response = await fetch(`/api/designs/${id}`)
-      if (!response.ok) throw new Error('Failed to fetch design details')
-      
-      const design = await response.json()
-      
-      setTextContent(design.text.textContent)
-      setTextColor(design.text.textColor)
-      setFontSize(design.text.fontSize)
-      setTextPosition(design.text.textPosition)
-      setTextRotation(design.text.textRotation)
-      setTextScale(design.text.textScale)
-      
-      setLogoUrl(design.logo.logoUrl)
-      setLogoPosition(design.logo.logoPosition)
-      setLogoRotation(design.logo.logoRotation)
-      setLogoScale(design.logo.logoScale)
+    setLogoUrl(design.logo.logoUrl)
+    setLogoPosition(design.logo.logoPosition)
+    setLogoRotation(design.logo.logoRotation)
+    setLogoScale(design.logo.logoScale)
 
-      // Apply model if it was saved in this design payload
-      if (design.model) {
-        setCustomModelUrl(design.model.customModelUrl || null)
-      } else {
-        setCustomModelUrl(null)
-      }
-      
-      toast.success('Design loaded!', { id: loadingToast, icon: '🎨' })
-    } catch (error) {
-      toast.error('Error loading design: ' + error.message, { id: loadingToast })
+    // Apply model if it was saved in this design payload
+    if (design.model) {
+      setCustomModelUrl(design.model.customModelUrl || null)
+    } else {
+      setCustomModelUrl(null)
     }
+    
+    toast.success('Design loaded from library', { icon: '🎨' })
   }
+
 
 
   return (
@@ -100,8 +90,9 @@ export const LibrarySidebar = memo(() => {
           {designs.map((design) => (
             <div key={design.id} style={{ position: 'relative', display: 'flex', gap: '8px' }}>
               <button
-                onClick={() => handleLoadDesign(design.id)}
+                onClick={() => handleLoadDesign(design)}
                 className="premium-input"
+
 
                 style={{ 
                   flex: 1,

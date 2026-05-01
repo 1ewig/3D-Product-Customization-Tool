@@ -1,7 +1,6 @@
 /**
- * Vercel Serverless Function - Express Backend (High-Performance KV Edition)
- * This file handles persistent storage using Vercel KV (Redis).
- * Optimized to use metadata indexing and individual design keys for speed.
+ * Vercel Serverless Function - Express Backend (Classic Edition)
+ * Reverted to single-array storage for maximum snappiness and instant switching.
  */
 
 import express from 'express';
@@ -18,14 +17,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Configuration Keys
-const METADATA_KEY = 'product_designs_metadata'; // Lightweight index
-const DESIGN_PREFIX = 'design:';                  // Prefix for heavy data
-const LOCAL_DIR = path.join('/tmp', 'designs');   // Local fallback directory
-
-// Ensure local directory exists for fallback
-if (!fs.existsSync(LOCAL_DIR)) {
-  fs.mkdirSync(LOCAL_DIR, { recursive: true });
-}
+const KV_KEY = 'product_designs';
+const DATA_FILE = path.join('/tmp', 'designs.json');
 
 // ─── MIDDLEWARE ──────────────────────────────────────────────────────────────
 app.use(cors());
@@ -33,97 +26,72 @@ app.use(express.json({ limit: '50mb' }));
 
 // ─── STORAGE HELPERS ─────────────────────────────────────────────────────────
 
-const getMetadata = async () => {
+const readData = async () => {
   if (process.env.KV_REST_API_URL) {
-    return (await kv.get(METADATA_KEY)) || [];
+    try {
+      const designs = await kv.get(KV_KEY);
+      return designs || [];
+    } catch (e) {
+      console.error('KV Read Error:', e);
+    }
   }
-  const metaPath = path.join(LOCAL_DIR, 'metadata.json');
-  if (!fs.existsSync(metaPath)) return [];
-  return JSON.parse(fs.readFileSync(metaPath));
+
+  if (!fs.existsSync(DATA_FILE)) return [];
+  try {
+    const data = fs.readFileSync(DATA_FILE);
+    return JSON.parse(data);
+  } catch (e) {
+    return [];
+  }
 };
 
-const saveMetadata = async (metadata) => {
+const writeData = async (data) => {
   if (process.env.KV_REST_API_URL) {
-    await kv.set(METADATA_KEY, metadata);
-    return;
+    try {
+      await kv.set(KV_KEY, data);
+      return;
+    } catch (e) {
+      console.error('KV Write Error:', e);
+    }
   }
-  fs.writeFileSync(path.join(LOCAL_DIR, 'metadata.json'), JSON.stringify(metadata, null, 2));
-};
 
-const getDesignData = async (id) => {
-  if (process.env.KV_REST_API_URL) {
-    return await kv.get(`${DESIGN_PREFIX}${id}`);
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+  } catch (e) {
+    console.error('FS Write Error:', e);
   }
-  const designPath = path.join(LOCAL_DIR, `${id}.json`);
-  if (!fs.existsSync(designPath)) return null;
-  return JSON.parse(fs.readFileSync(designPath));
-};
-
-const saveDesignData = async (id, data) => {
-  if (process.env.KV_REST_API_URL) {
-    await kv.set(`${DESIGN_PREFIX}${id}`, data);
-    return;
-  }
-  fs.writeFileSync(path.join(LOCAL_DIR, `${id}.json`), JSON.stringify(data, null, 2));
-};
-
-const deleteDesignData = async (id) => {
-  if (process.env.KV_REST_API_URL) {
-    await kv.del(`${DESIGN_PREFIX}${id}`);
-    return;
-  }
-  const designPath = path.join(LOCAL_DIR, `${id}.json`);
-  if (fs.existsSync(designPath)) fs.unlinkSync(designPath);
 };
 
 // ─── API ROUTES ──────────────────────────────────────────────────────────────
 
 /**
  * GET /api/designs
- * Returns lightweight metadata (ID and Date) for the Library list.
+ * Fetches ALL designs at once for instant client-side switching.
  */
 app.get('/api/designs', async (req, res) => {
   try {
-    const metadata = await getMetadata();
-    res.json(metadata);
+    const designs = await readData();
+    res.json(designs);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to load library' });
-  }
-});
-
-/**
- * GET /api/designs/:id
- * Fetches the heavy design data on-demand.
- */
-app.get('/api/designs/:id', async (req, res) => {
-  try {
-    const design = await getDesignData(req.params.id);
-    if (!design) return res.status(404).json({ error: 'Design not found' });
-    res.json(design);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch design' });
+    res.status(500).json({ error: 'Failed to load designs' });
   }
 });
 
 /**
  * POST /api/designs
- * Saves a new design with split-key storage.
+ * Saves a new design to the global array.
  */
 app.post('/api/designs', async (req, res) => {
   try {
-    const id = Date.now().toString();
-    const createdAt = new Date().toISOString();
-    const newDesign = { id, createdAt, ...req.body };
-
-    // 1. Save heavy data to its own key
-    await saveDesignData(id, newDesign);
-
-    // 2. Update lightweight metadata index
-    const metadata = await getMetadata();
-    metadata.unshift({ id, createdAt });
-    await saveMetadata(metadata);
-
-    res.status(201).json({ id, createdAt });
+    const designs = await readData();
+    const newDesign = {
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      ...req.body
+    };
+    designs.unshift(newDesign); // Add to beginning
+    await writeData(designs);
+    res.status(201).json(newDesign);
   } catch (error) {
     res.status(500).json({ error: 'Failed to save design' });
   }
@@ -133,14 +101,11 @@ app.post('/api/designs', async (req, res) => {
  * DELETE /api/designs/:id
  */
 app.delete('/api/designs/:id', async (req, res) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
-    await deleteDesignData(id);
-
-    const metadata = await getMetadata();
-    const updatedMetadata = metadata.filter(d => d.id !== id);
-    await saveMetadata(updatedMetadata);
-
+    const designs = await readData();
+    const updatedDesigns = designs.filter(d => d.id !== id);
+    await writeData(updatedDesigns);
     res.json({ message: 'Design deleted' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete design' });
@@ -149,10 +114,11 @@ app.delete('/api/designs/:id', async (req, res) => {
 
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
   app.listen(PORT, () => {
-    console.log(`🚀 KV-Optimized API running on http://localhost:${PORT}`);
+    console.log(`🚀 Classic API running on http://localhost:${PORT}`);
   });
 }
 
 export default app;
+
 
 
