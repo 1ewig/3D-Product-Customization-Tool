@@ -78,20 +78,42 @@ const writeData = async (data) => {
 
 /**
  * GET /api/designs
- * Fetches all saved product customization designs.
+ * Fetches metadata for all saved designs (Lightweight for Library list).
  */
 app.get('/api/designs', async (req, res) => {
   try {
     const designs = await readData();
-    res.json(designs);
+    // Optimization for Vercel: Only return ID and Date for the list view
+    // This prevents multi-megabyte Base64 strings from slowing down the UI
+    const metadata = designs.map(d => ({
+      id: d.id,
+      createdAt: d.createdAt
+    }));
+    res.json(metadata);
   } catch (error) {
     res.status(500).json({ error: 'Failed to load designs' });
   }
 });
 
 /**
+ * GET /api/designs/:id
+ * Fetches the full design data (heavy text/logo/model data) by ID.
+ */
+app.get('/api/designs/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const designs = await readData();
+    const design = designs.find(d => d.id === id);
+    if (!design) return res.status(404).json({ error: 'Design not found' });
+    res.json(design);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch design details' });
+  }
+});
+
+/**
  * POST /api/designs
- * Saves a new customization design (includes text and Base64 image data).
+ * Saves a new customization design.
  */
 app.post('/api/designs', async (req, res) => {
   try {
@@ -103,11 +125,13 @@ app.post('/api/designs', async (req, res) => {
     };
     designs.push(newDesign);
     await writeData(designs);
-    res.status(201).json(newDesign);
+    // Return only metadata after save to keep response light
+    res.status(201).json({ id: newDesign.id, createdAt: newDesign.createdAt });
   } catch (error) {
     res.status(500).json({ error: 'Failed to save design' });
   }
 });
+
 
 /**
  * DELETE /api/designs/:id
