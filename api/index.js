@@ -1,98 +1,129 @@
 /**
- * Vercel Serverless Function - Express Backend (MongoDB Edition)
- * This file handles persistent storage using MongoDB Atlas.
- * It uses a singleton pattern to maintain database connections in serverless.
+ * Vercel Serverless Function - Express Backend (High-Performance KV Edition)
+ * This file handles persistent storage using Vercel KV (Redis).
+ * Optimized to use metadata indexing and individual design keys for speed.
  */
 
 import express from 'express';
 import cors from 'cors';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import Design from './models/Design.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { kv } from '@vercel/kv';
 
-// Load environment variables from .env file
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
-
 const PORT = process.env.PORT || 5000;
 
-// ─── MONGODB CONNECTION (SINGLETON) ──────────────────────────────────────────
-const MONGODB_URI = process.env.MONGODB_URI;
+// Configuration Keys
+const METADATA_KEY = 'product_designs_metadata'; // Lightweight index
+const DESIGN_PREFIX = 'design:';                  // Prefix for heavy data
+const LOCAL_DIR = path.join('/tmp', 'designs');   // Local fallback directory
 
-let isConnected = false;
-
-const connectToDatabase = async () => {
-  if (isConnected) return;
-
-  if (!MONGODB_URI) {
-    console.error('❌ MONGODB_URI is missing from environment variables!');
-    return;
-  }
-
-  try {
-    const db = await mongoose.connect(MONGODB_URI);
-    isConnected = db.connections[0].readyState === 1;
-    console.log('✅ Connected to MongoDB Atlas');
-  } catch (error) {
-    console.error('❌ MongoDB Connection Error:', error);
-  }
-};
+// Ensure local directory exists for fallback
+if (!fs.existsSync(LOCAL_DIR)) {
+  fs.mkdirSync(LOCAL_DIR, { recursive: true });
+}
 
 // ─── MIDDLEWARE ──────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
-// Middleware to ensure DB is connected before handling requests
-app.use(async (req, res, next) => {
-  await connectToDatabase();
-  next();
-});
+// ─── STORAGE HELPERS ─────────────────────────────────────────────────────────
+
+const getMetadata = async () => {
+  if (process.env.KV_REST_API_URL) {
+    return (await kv.get(METADATA_KEY)) || [];
+  }
+  const metaPath = path.join(LOCAL_DIR, 'metadata.json');
+  if (!fs.existsSync(metaPath)) return [];
+  return JSON.parse(fs.readFileSync(metaPath));
+};
+
+const saveMetadata = async (metadata) => {
+  if (process.env.KV_REST_API_URL) {
+    await kv.set(METADATA_KEY, metadata);
+    return;
+  }
+  fs.writeFileSync(path.join(LOCAL_DIR, 'metadata.json'), JSON.stringify(metadata, null, 2));
+};
+
+const getDesignData = async (id) => {
+  if (process.env.KV_REST_API_URL) {
+    return await kv.get(`${DESIGN_PREFIX}${id}`);
+  }
+  const designPath = path.join(LOCAL_DIR, `${id}.json`);
+  if (!fs.existsSync(designPath)) return null;
+  return JSON.parse(fs.readFileSync(designPath));
+};
+
+const saveDesignData = async (id, data) => {
+  if (process.env.KV_REST_API_URL) {
+    await kv.set(`${DESIGN_PREFIX}${id}`, data);
+    return;
+  }
+  fs.writeFileSync(path.join(LOCAL_DIR, `${id}.json`), JSON.stringify(data, null, 2));
+};
+
+const deleteDesignData = async (id) => {
+  if (process.env.KV_REST_API_URL) {
+    await kv.del(`${DESIGN_PREFIX}${id}`);
+    return;
+  }
+  const designPath = path.join(LOCAL_DIR, `${id}.json`);
+  if (fs.existsSync(designPath)) fs.unlinkSync(designPath);
+};
 
 // ─── API ROUTES ──────────────────────────────────────────────────────────────
 
 /**
  * GET /api/designs
- * Fetches lightweight metadata for all saved designs.
+ * Returns lightweight metadata (ID and Date) for the Library list.
  */
 app.get('/api/designs', async (req, res) => {
   try {
-    // Fetch designs and map _id to id for frontend compatibility
-    const designs = await Design.find({}, '_id createdAt').sort({ createdAt: -1 });
-    const metadata = designs.map(d => ({
-      id: d._id,
-      createdAt: d.createdAt
-    }));
+    const metadata = await getMetadata();
     res.json(metadata);
   } catch (error) {
-
-    res.status(500).json({ error: 'Failed to load designs' });
+    res.status(500).json({ error: 'Failed to load library' });
   }
 });
 
 /**
  * GET /api/designs/:id
- * Fetches the full design data by ID.
+ * Fetches the heavy design data on-demand.
  */
 app.get('/api/designs/:id', async (req, res) => {
   try {
-    const design = await Design.findById(req.params.id);
+    const design = await getDesignData(req.params.id);
     if (!design) return res.status(404).json({ error: 'Design not found' });
     res.json(design);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch design details' });
+    res.status(500).json({ error: 'Failed to fetch design' });
   }
 });
 
 /**
  * POST /api/designs
- * Saves a new customization design document.
+ * Saves a new design with split-key storage.
  */
 app.post('/api/designs', async (req, res) => {
   try {
-    const newDesign = await Design.create(req.body);
-    // Return metadata of the newly created document
-    res.status(201).json({ id: newDesign._id, createdAt: newDesign.createdAt });
+    const id = Date.now().toString();
+    const createdAt = new Date().toISOString();
+    const newDesign = { id, createdAt, ...req.body };
+
+    // 1. Save heavy data to its own key
+    await saveDesignData(id, newDesign);
+
+    // 2. Update lightweight metadata index
+    const metadata = await getMetadata();
+    metadata.unshift({ id, createdAt });
+    await saveMetadata(metadata);
+
+    res.status(201).json({ id, createdAt });
   } catch (error) {
     res.status(500).json({ error: 'Failed to save design' });
   }
@@ -100,23 +131,28 @@ app.post('/api/designs', async (req, res) => {
 
 /**
  * DELETE /api/designs/:id
- * Removes a specific design document.
  */
 app.delete('/api/designs/:id', async (req, res) => {
   try {
-    await Design.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+    await deleteDesignData(id);
+
+    const metadata = await getMetadata();
+    const updatedMetadata = metadata.filter(d => d.id !== id);
+    await saveMetadata(updatedMetadata);
+
     res.json({ message: 'Design deleted' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete design' });
   }
 });
 
-// ─── LOCAL SERVER ────────────────────────────────────────────────────────────
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
   app.listen(PORT, () => {
-    console.log(`🚀 API running on http://localhost:${PORT}`);
+    console.log(`🚀 KV-Optimized API running on http://localhost:${PORT}`);
   });
 }
 
 export default app;
+
 
