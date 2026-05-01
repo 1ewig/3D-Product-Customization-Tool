@@ -1,82 +1,104 @@
 import express from 'express';
 import cors from 'cors';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import Design from '../api/models/Design.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Load environment variables from .env file
+dotenv.config();
 
 const app = express();
-const PORT = 5000;
-const DATA_FILE = path.join(__dirname, 'designs.json');
+const PORT = process.env.PORT || 5000;
 
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+// ─── MONGODB CONNECTION (SINGLETON) ──────────────────────────────────────────
+const MONGODB_URI = process.env.MONGODB_URI;
 
-// Helper to read data
-const readData = () => {
-  if (!fs.existsSync(DATA_FILE)) return [];
-  const data = fs.readFileSync(DATA_FILE);
-  return JSON.parse(data);
-};
+let isConnected = false;
 
-// Helper to write data
-const writeData = (data) => {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-};
+const connectToDatabase = async () => {
+  if (isConnected) return;
 
-// Get all saved designs
-app.get('/api/designs', (req, res) => {
+  if (!MONGODB_URI) {
+    console.error('❌ MONGODB_URI is missing from environment variables!');
+    return;
+  }
+
   try {
-    const designs = readData();
-    res.json(designs);
+    const db = await mongoose.connect(MONGODB_URI);
+    isConnected = db.connections[0].readyState === 1;
+    console.log('✅ Connected to MongoDB Atlas');
+  } catch (error) {
+    console.error('❌ MongoDB Connection Error:', error);
+  }
+};
+
+// ─── MIDDLEWARE ──────────────────────────────────────────────────────────────
+app.use(cors());
+app.use(express.json({ limit: '50mb' }));
+
+// Middleware to ensure DB is connected before handling requests
+app.use(async (req, res, next) => {
+  await connectToDatabase();
+  next();
+});
+
+// ─── API ROUTES ──────────────────────────────────────────────────────────────
+
+/**
+ * GET /api/designs
+ * Fetches lightweight metadata for all saved designs.
+ */
+app.get('/api/designs', async (req, res) => {
+  try {
+    const designs = await Design.find({}, '_id createdAt').sort({ createdAt: -1 });
+    const metadata = designs.map(d => ({
+      id: d._id,
+      createdAt: d.createdAt
+    }));
+    res.json(metadata);
   } catch (error) {
     res.status(500).json({ error: 'Failed to load designs' });
   }
 });
 
-// Save a new design
-app.post('/api/designs', (req, res) => {
+/**
+ * GET /api/designs/:id
+ */
+app.get('/api/designs/:id', async (req, res) => {
   try {
-    const designs = readData();
-    const newDesign = {
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      ...req.body
-    };
-    designs.push(newDesign);
-    writeData(designs);
-    res.status(201).json(newDesign);
+    const design = await Design.findById(req.params.id);
+    if (!design) return res.status(404).json({ error: 'Design not found' });
+    res.json(design);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch design details' });
+  }
+});
+
+/**
+ * POST /api/designs
+ */
+app.post('/api/designs', async (req, res) => {
+  try {
+    const newDesign = await Design.create(req.body);
+    res.status(201).json({ id: newDesign._id, createdAt: newDesign.createdAt });
   } catch (error) {
     res.status(500).json({ error: 'Failed to save design' });
   }
 });
 
-// Delete a design
-app.delete('/api/designs/:id', (req, res) => {
-  const { id } = req.params;
-  console.log(`🗑️ Attempting to delete design ID: ${id}`);
-  
+/**
+ * DELETE /api/designs/:id
+ */
+app.delete('/api/designs/:id', async (req, res) => {
   try {
-    const designs = readData();
-    const initialCount = designs.length;
-    const updatedDesigns = designs.filter(d => d.id !== id);
-    
-    if (updatedDesigns.length === initialCount) {
-      console.log(`⚠️ No design found with ID: ${id}`);
-      return res.status(404).json({ error: 'Design not found' });
-    }
-
-    writeData(updatedDesigns);
-    console.log(`✅ Successfully deleted design ID: ${id}`);
+    await Design.findByIdAndDelete(req.params.id);
     res.json({ message: 'Design deleted' });
   } catch (error) {
-    console.error('❌ Error during deletion:', error);
-    res.status(500).json({ error: 'Failed to delete design: ' + error.message });
+    res.status(500).json({ error: 'Failed to delete design' });
   }
 });
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+

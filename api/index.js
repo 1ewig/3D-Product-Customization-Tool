@@ -1,109 +1,82 @@
 /**
- * Vercel Serverless Function - Express Backend
- * This file serves as the main entry point for the backend API.
- * It handles persistent storage using Vercel KV in production 
- * and falls back to the local filesystem during development.
+ * Vercel Serverless Function - Express Backend (MongoDB Edition)
+ * This file handles persistent storage using MongoDB Atlas.
+ * It uses a singleton pattern to maintain database connections in serverless.
  */
 
 import express from 'express';
 import cors from 'cors';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { kv } from '@vercel/kv';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import Design from './models/Design.js';
 
-// ESM dirname equivalent
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Load environment variables from .env file
+dotenv.config();
 
 const app = express();
+
 const PORT = process.env.PORT || 5000;
 
-// Configuration for local vs cloud storage
-const DATA_FILE = path.join('/tmp', 'designs.json'); // Local fallback (ephemeral on Vercel)
-const KV_KEY = 'product_designs';                  // Redis key for Vercel KV
+// ─── MONGODB CONNECTION (SINGLETON) ──────────────────────────────────────────
+const MONGODB_URI = process.env.MONGODB_URI;
 
-// Middleware setup
+let isConnected = false;
+
+const connectToDatabase = async () => {
+  if (isConnected) return;
+
+  if (!MONGODB_URI) {
+    console.error('❌ MONGODB_URI is missing from environment variables!');
+    return;
+  }
+
+  try {
+    const db = await mongoose.connect(MONGODB_URI);
+    isConnected = db.connections[0].readyState === 1;
+    console.log('✅ Connected to MongoDB Atlas');
+  } catch (error) {
+    console.error('❌ MongoDB Connection Error:', error);
+  }
+};
+
+// ─── MIDDLEWARE ──────────────────────────────────────────────────────────────
 app.use(cors());
-app.use(express.json({ limit: '50mb' })); // Higher limit to support Base64 image and model strings
+app.use(express.json({ limit: '50mb' }));
 
-/**
- * Reads design data from the best available storage source.
- * Prioritizes Vercel KV (Redis) if configured.
- */
-const readData = async () => {
-  // Check if Vercel KV environment variables are present
-  if (process.env.KV_REST_API_URL) {
-    try {
-      const designs = await kv.get(KV_KEY);
-      return designs || [];
-    } catch (e) {
-      console.error('KV Read Error:', e);
-    }
-  }
-
-  // Fallback: Read from local /tmp file system
-  if (!fs.existsSync(DATA_FILE)) return [];
-  try {
-    const data = fs.readFileSync(DATA_FILE);
-    return JSON.parse(data);
-  } catch (e) {
-    return [];
-  }
-};
-
-/**
- * Writes design data to the best available storage source.
- */
-const writeData = async (data) => {
-  // Save to Vercel KV if available
-  if (process.env.KV_REST_API_URL) {
-    try {
-      await kv.set(KV_KEY, data);
-      return;
-    } catch (e) {
-      console.error('KV Write Error:', e);
-    }
-  }
-
-  // Fallback: Write to local /tmp file system
-  try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-  } catch (e) {
-    console.error('FS Write Error:', e);
-  }
-};
+// Middleware to ensure DB is connected before handling requests
+app.use(async (req, res, next) => {
+  await connectToDatabase();
+  next();
+});
 
 // ─── API ROUTES ──────────────────────────────────────────────────────────────
 
 /**
  * GET /api/designs
- * Fetches metadata for all saved designs (Lightweight for Library list).
+ * Fetches lightweight metadata for all saved designs.
  */
 app.get('/api/designs', async (req, res) => {
   try {
-    const designs = await readData();
-    // Optimization for Vercel: Only return ID and Date for the list view
-    // This prevents multi-megabyte Base64 strings from slowing down the UI
+    // Fetch designs and map _id to id for frontend compatibility
+    const designs = await Design.find({}, '_id createdAt').sort({ createdAt: -1 });
     const metadata = designs.map(d => ({
-      id: d.id,
+      id: d._id,
       createdAt: d.createdAt
     }));
     res.json(metadata);
   } catch (error) {
+
     res.status(500).json({ error: 'Failed to load designs' });
   }
 });
 
 /**
  * GET /api/designs/:id
- * Fetches the full design data (heavy text/logo/model data) by ID.
+ * Fetches the full design data by ID.
  */
 app.get('/api/designs/:id', async (req, res) => {
-  const { id } = req.params;
   try {
-    const designs = await readData();
-    const design = designs.find(d => d.id === id);
+    const design = await Design.findById(req.params.id);
     if (!design) return res.status(404).json({ error: 'Design not found' });
     res.json(design);
   } catch (error) {
@@ -113,50 +86,37 @@ app.get('/api/designs/:id', async (req, res) => {
 
 /**
  * POST /api/designs
- * Saves a new customization design.
+ * Saves a new customization design document.
  */
 app.post('/api/designs', async (req, res) => {
   try {
-    const designs = await readData();
-    const newDesign = {
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      ...req.body
-    };
-    designs.push(newDesign);
-    await writeData(designs);
-    // Return only metadata after save to keep response light
-    res.status(201).json({ id: newDesign.id, createdAt: newDesign.createdAt });
+    const newDesign = await Design.create(req.body);
+    // Return metadata of the newly created document
+    res.status(201).json({ id: newDesign._id, createdAt: newDesign.createdAt });
   } catch (error) {
     res.status(500).json({ error: 'Failed to save design' });
   }
 });
 
-
 /**
  * DELETE /api/designs/:id
- * Removes a specific design from the library by its ID.
+ * Removes a specific design document.
  */
 app.delete('/api/designs/:id', async (req, res) => {
-  const { id } = req.params;
   try {
-    const designs = await readData();
-    const updatedDesigns = designs.filter(d => d.id !== id);
-    await writeData(updatedDesigns);
+    await Design.findByIdAndDelete(req.params.id);
     res.json({ message: 'Design deleted' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete design' });
   }
 });
 
-/**
- * Local server initiation (bypassed on Vercel deployment)
- */
+// ─── LOCAL SERVER ────────────────────────────────────────────────────────────
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
   app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🚀 API running on http://localhost:${PORT}`);
   });
 }
 
-// Export for Vercel Serverless Function handling
 export default app;
+
