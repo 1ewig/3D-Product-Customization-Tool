@@ -26,9 +26,5 @@ dist-ssr
 # Project notes
 *.txt
 
-# Environment Variables
-.env
-
 # Local Database
 server/designs.json
-
