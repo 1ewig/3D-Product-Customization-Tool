@@ -48,6 +48,10 @@ export const useCustomizationStore = create(
       // ─── PRODUCT / MODEL STATE ─────────────────────────────────────────────
       customModelUrl: null,               // URL or Base64 of a user-uploaded GLB model
       currentModelIndex: 0,               // Index of the active built-in model
+      
+      // ─── TRANSIENT DEBUG / MESH DEBUGGER STATE ──────────────────────────────
+      modelMeshes: [],                    // List of meshes detected in the loaded 3D model
+      highlightedMeshUuid: null,          // UUID of currently highlighted mesh
 
       // ─── TEXT STATE ────────────────────────────────────────────────────────
       textContent: 'CHAMPRO',              // Current text content
@@ -71,6 +75,8 @@ export const useCustomizationStore = create(
       // ─── SETTERS ───────────────────────────────────────────────────────────
       setCustomModelUrl: (customModelUrl) => set({ customModelUrl }),
       setCurrentModelIndex: (currentModelIndex) => set({ currentModelIndex }),
+      setModelMeshes: (modelMeshes) => set({ modelMeshes }),
+      setHighlightedMeshUuid: (highlightedMeshUuid) => set({ highlightedMeshUuid }),
       
       setTextContent: (textContent) => set({ textContent }),
       setTextColor: (textColor) => set({ textColor }),
@@ -110,13 +116,20 @@ export const useCustomizationStore = create(
 
       resetModel: () => set({
         customModelUrl: null,
-        currentModelIndex: 0
+        currentModelIndex: 0,
+        modelMeshes: [],
+        highlightedMeshUuid: null
       }),
     }), 
     { 
       name: 'product-customization-storage',
       // Wrap the standard localStorage with our debouncer
-      storage: createJSONStorage(() => createDebouncedStorage(localStorage, 500))
+      storage: createJSONStorage(() => createDebouncedStorage(localStorage, 500)),
+      // Exclude non-serializable and transient debug values from storage persistence
+      partialize: (state) => {
+        const { modelMeshes, highlightedMeshUuid, ...persistedState } = state
+        return persistedState
+      }
     }
   )
 )

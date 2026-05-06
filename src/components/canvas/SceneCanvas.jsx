@@ -10,7 +10,7 @@ import { OrbitControls, Center, PerspectiveCamera, TransformControls } from '@re
 import { ShirtModel } from './ShirtModel'
 import { TextOverlay } from './TextOverlay'
 import { LogoOverlay } from './LogoOverlay'
-import { ViewportToolbar } from '../ui'
+import { ViewportToolbar, MeshDebugger } from '../ui'
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 
 export const SceneCanvas = () => {
@@ -144,6 +144,9 @@ export const SceneCanvas = () => {
 
       {/* Floating Toolbar for scene-level controls */}
       <ViewportToolbar orbitRef={orbitRef} />
+
+      {/* Floating Mesh Debugger Panel in the top-left */}
+      <MeshDebugger />
     </>
   )
 }
