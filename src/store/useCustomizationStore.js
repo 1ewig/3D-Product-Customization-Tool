@@ -9,6 +9,20 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import defaultLogo from '../assets/default-logo.png'
 
+import lowPolyTShirt from '../assets/models/t-shirt_low_poly.glb'
+import standardTShirt from '../assets/models/standard_t-shirt.glb'
+import oversizedTShirt from '../assets/models/oversized_t-shirt.glb'
+import womensShirt from '../assets/models/womens_shirt.glb'
+import collaredShirt from '../assets/models/shirt.glb'
+
+export const BUILTIN_MODELS = [
+  { id: 'low-poly-tshirt', name: 'Classic Low-Poly T-Shirt', path: lowPolyTShirt },
+  { id: 'standard-tshirt', name: 'Standard T-Shirt', path: standardTShirt },
+  { id: 'oversized-tshirt', name: 'Oversized T-Shirt', path: oversizedTShirt },
+  { id: 'womens-shirt', name: 'Womens Shirt', path: womensShirt },
+  { id: 'collared-shirt', name: 'Collared Shirt', path: collaredShirt }
+]
+
 /**
  * Custom Debounced Storage Wrapper
  * Prevents expensive LocalStorage writes on every frame during slider movements.
@@ -33,6 +47,7 @@ export const useCustomizationStore = create(
     (set) => ({
       // ─── PRODUCT / MODEL STATE ─────────────────────────────────────────────
       customModelUrl: null,               // URL or Base64 of a user-uploaded GLB model
+      currentModelIndex: 0,               // Index of the active built-in model
 
       // ─── TEXT STATE ────────────────────────────────────────────────────────
       textContent: 'CHAMPRO',              // Current text content
@@ -55,6 +70,7 @@ export const useCustomizationStore = create(
 
       // ─── SETTERS ───────────────────────────────────────────────────────────
       setCustomModelUrl: (customModelUrl) => set({ customModelUrl }),
+      setCurrentModelIndex: (currentModelIndex) => set({ currentModelIndex }),
       
       setTextContent: (textContent) => set({ textContent }),
       setTextColor: (textColor) => set({ textColor }),
@@ -93,7 +109,8 @@ export const useCustomizationStore = create(
       }),
 
       resetModel: () => set({
-        customModelUrl: null
+        customModelUrl: null,
+        currentModelIndex: 0
       }),
     }), 
     { 

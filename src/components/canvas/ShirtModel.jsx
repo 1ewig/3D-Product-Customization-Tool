@@ -1,10 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
-import { useCustomizationStore } from '../../store/useCustomizationStore'
-
-// Primary default model
-import defaultModelPath from '../../assets/t-shirt_low_poly.glb'
+import { useCustomizationStore, BUILTIN_MODELS } from '../../store/useCustomizationStore'
 
 /**
  * Normalizes the scale and position of a GLTF scene so that it fits 
@@ -45,13 +42,18 @@ const NormalizedModel = ({ path, scale = 1.5 }) => {
 }
 
 export const ShirtModel = () => {
-  const { customModelUrl } = useCustomizationStore()
+  const customModelUrl = useCustomizationStore(state => state.customModelUrl)
+  const currentModelIndex = useCustomizationStore(state => state.currentModelIndex)
 
-  // Use uploaded model if available, otherwise fallback to primary default
-  const activePath = customModelUrl || defaultModelPath
+  // Use uploaded model if available, otherwise fallback to active built-in model
+  const activePath = customModelUrl || BUILTIN_MODELS[currentModelIndex]?.path || BUILTIN_MODELS[0].path
 
   return <NormalizedModel key={activePath} path={activePath} />
 }
 
-// Pre-load default model
-useGLTF.preload(defaultModelPath)
+// Pre-load all available built-in models to prevent dynamic loading flicker
+BUILTIN_MODELS.forEach((model) => {
+  if (model.path) {
+    useGLTF.preload(model.path)
+  }
+})
