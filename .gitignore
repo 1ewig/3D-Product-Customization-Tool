@@ -28,3 +28,7 @@ dist-ssr
 
 # Local Database
 server/designs.json
+
+# Temporary assets/experimental folders
+New folder/
+
