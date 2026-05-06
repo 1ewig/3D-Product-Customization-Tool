@@ -14,13 +14,17 @@ import standardTShirt from '../assets/models/standard_t-shirt.glb'
 import oversizedTShirt from '../assets/models/oversized_t-shirt.glb'
 import womensShirt from '../assets/models/womens_shirt.glb'
 import collaredShirt from '../assets/models/shirt.glb'
+import soccerShorts from '../assets/models/SOCCER SHORTS.glb'
+import soccerShirt from '../assets/models/Soccer shirt (1).glb'
 
 export const BUILTIN_MODELS = [
   { id: 'low-poly-tshirt', name: 'Classic Low-Poly T-Shirt', path: lowPolyTShirt },
   { id: 'standard-tshirt', name: 'Standard T-Shirt', path: standardTShirt },
   { id: 'oversized-tshirt', name: 'Oversized T-Shirt', path: oversizedTShirt },
   { id: 'womens-shirt', name: 'Womens Shirt', path: womensShirt },
-  { id: 'collared-shirt', name: 'Collared Shirt', path: collaredShirt }
+  { id: 'collared-shirt', name: 'Collared Shirt', path: collaredShirt },
+  { id: 'soccer-shorts', name: 'Soccer Shorts', path: soccerShorts },
+  { id: 'soccer-shirt', name: 'Soccer Shirt', path: soccerShirt }
 ]
 
 /**
