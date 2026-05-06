@@ -91,7 +91,6 @@ export const LogoOverlay = memo(forwardRef(function LogoOverlay(_, ref) {
 
         return createPortal(
           <Decal
-            key={mesh.uuid}
             mesh={{ current: mesh }}
             position={[localPos.x, localPos.y, localPos.z]}
             rotation={[0, 0, logoRotation]}
@@ -102,7 +101,8 @@ export const LogoOverlay = memo(forwardRef(function LogoOverlay(_, ref) {
             depthWrite={false}
             side={THREE.FrontSide}
           />,
-          mesh
+          mesh,
+          mesh.uuid
         )
       })}
     </>

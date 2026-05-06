@@ -121,7 +121,6 @@ export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
 
         return createPortal(
           <Decal
-            key={mesh.uuid}
             mesh={{ current: mesh }}
             position={[localPos.x, localPos.y, localPos.z]}
             rotation={[0, 0, textRotation]}
@@ -132,7 +131,8 @@ export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
             depthWrite={false}
             side={THREE.FrontSide}
           />,
-          mesh
+          mesh,
+          mesh.uuid
         )
       })}
     </>

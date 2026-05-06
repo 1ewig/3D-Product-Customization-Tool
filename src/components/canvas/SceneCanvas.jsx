@@ -117,7 +117,11 @@ export const SceneCanvas = () => {
 
           {/* Overlays */}
           {textContent && <TextOverlay ref={textRefCallback} />}
-          {logoUrl && <LogoOverlay ref={logoRefCallback} />}
+          {logoUrl && (
+            <Suspense fallback={null}>
+              <LogoOverlay ref={logoRefCallback} />
+            </Suspense>
+          )}
 
           {/* Interaction Gizmos (Translation/Rotation/Scaling tools) */}
           {showTextGizmo && (
