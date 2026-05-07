@@ -32,9 +32,9 @@ export const LogoOverlay = memo(forwardRef(function LogoOverlay(_, ref) {
         const name = child.name.toLowerCase()
         // Ignore decals, helpers, highlights, and wireframes
         if (
-          !name.includes('decal') && 
-          !name.includes('helper') && 
-          !name.includes('highlight') && 
+          !name.includes('decal') &&
+          !name.includes('helper') &&
+          !name.includes('highlight') &&
           !name.includes('wireframe')
         ) {
           meshes.push(child)
@@ -102,8 +102,7 @@ export const LogoOverlay = memo(forwardRef(function LogoOverlay(_, ref) {
                 depthTest={true}
                 depthWrite={false}
                 side={THREE.FrontSide}
-                polygonOffset={true}
-                polygonOffsetFactor={-1}
+
               />,
               mesh
             )}
