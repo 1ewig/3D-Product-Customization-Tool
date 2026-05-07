@@ -11,7 +11,6 @@ const NormalizedModel = ({ path, scale = 1.5 }) => {
   const { scene } = useGLTF(path)
   
   const setModelMeshes = useCustomizationStore(state => state.setModelMeshes)
-  const highlightedMeshUuid = useCustomizationStore(state => state.highlightedMeshUuid)
 
   const clonedScene = useMemo(() => {
     // Clone to avoid mutation of cached scenes
@@ -58,44 +57,6 @@ const NormalizedModel = ({ path, scale = 1.5 }) => {
       setModelMeshes([])
     }
   }, [clonedScene, setModelMeshes])
-
-  // Apply a glowing neon blue highlight material to the selected mesh in-place (very safe!)
-  useEffect(() => {
-    if (!clonedScene) return
-
-    // Keep track of original materials we replaced to restore them cleanly
-    const originalMaterials = new Map()
-
-    clonedScene.traverse((child) => {
-      if (child.isMesh) {
-        if (highlightedMeshUuid && child.uuid === highlightedMeshUuid) {
-          // Store original material
-          originalMaterials.set(child.uuid, child.material)
-          
-          // Apply a standard material configured as an emissive wireframe
-          child.material = new THREE.MeshStandardMaterial({
-            color: 0x3b82f6,
-            roughness: 0.1,
-            metalness: 0.8,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.8,
-            emissive: 0x3b82f6,
-            emissiveIntensity: 0.5
-          })
-        }
-      }
-    })
-
-    return () => {
-      // Restore original materials when highlighted mesh changes or component unmounts
-      clonedScene.traverse((child) => {
-        if (child.isMesh && originalMaterials.has(child.uuid)) {
-          child.material = originalMaterials.get(child.uuid)
-        }
-      })
-    }
-  }, [clonedScene, highlightedMeshUuid])
 
   return (
     <group scale={[scale, scale, scale]}>
