@@ -16,6 +16,7 @@ import { createTextTexture } from '../../utils/createTextTexture'
 export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
   // ─── SELECTIVE STORE SUBSCRIPTIONS ─────────────────────────────────────────
   const textContent = useCustomizationStore(state => state.textContent)
+  const numberContent = useCustomizationStore(state => state.numberContent)
   const textColor = useCustomizationStore(state => state.textColor)
   const fontSize = useCustomizationStore(state => state.fontSize)
   const textPosition = useCustomizationStore(state => state.textPosition)
@@ -28,19 +29,19 @@ export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
 
   // ─── CANVAS TEXTURE GENERATION ──────────────────────────────────────────────
   useEffect(() => {
-    if (!textContent) return
+    if (!textContent && !numberContent) return
 
     if (!texture) {
       // Create texture for the first time
-      const tex = createTextTexture(textContent, fontSize, textColor)
+      const tex = createTextTexture(textContent, numberContent, fontSize, textColor)
       canvasRef.current = tex.image
       setTexture(tex)
     } else {
       // In-place context update for speed and performance
-      createTextTexture(textContent, fontSize, textColor, canvasRef.current)
+      createTextTexture(textContent, numberContent, fontSize, textColor, canvasRef.current)
       texture.needsUpdate = true
     }
-  }, [textContent, textColor, fontSize, texture])
+  }, [textContent, numberContent, textColor, fontSize, texture])
 
   // Clean up texture when overlay unmounts
   useEffect(() => {
@@ -74,7 +75,7 @@ export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
   }, [scene, modelMeshes])
 
   // Ensure content is loaded, a texture exists, and at least one valid target mesh exists in the scene
-  if (!textContent || !texture || targetMeshes.length === 0) return null
+  if ((!textContent && !numberContent) || !texture || targetMeshes.length === 0) return null
 
   return (
     <>

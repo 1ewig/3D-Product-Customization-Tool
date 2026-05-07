@@ -59,6 +59,7 @@ export const useCustomizationStore = create(
 
       // ─── TEXT STATE ────────────────────────────────────────────────────────
       textContent: 'CHAMPRO',              // Current text content
+      numberContent: '07',                // Current player number content
       textColor: '#000000',               // Hex color of the text
       fontSize: 48,                       // Initial font size
       textPosition: { x: 0, y: 0.15, z: 0 }, // 3D coordinates for text placement
@@ -83,6 +84,7 @@ export const useCustomizationStore = create(
       setHighlightedMeshUuid: (highlightedMeshUuid) => set({ highlightedMeshUuid }),
       
       setTextContent: (textContent) => set({ textContent }),
+      setNumberContent: (numberContent) => set({ numberContent }),
       setTextColor: (textColor) => set({ textColor }),
       setFontSize: (fontSize) => set({ fontSize }),
       setTextPosition: (textPosition) => set({ textPosition }),
@@ -102,6 +104,7 @@ export const useCustomizationStore = create(
       
       resetText: () => set({
         textContent: 'CHAMPRO',
+        numberContent: '07',
         textColor: '#000000',
         fontSize: 48,
         textPosition: { x: 0, y: 0.15, z: 0 },

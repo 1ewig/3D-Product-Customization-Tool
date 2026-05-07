@@ -7,6 +7,7 @@ export const TextControls = memo(() => {
   // We extract exactly what we need. This prevents the entire UI from 
   // re-rendering when unrelated store values (like logo position) change.
   const textContent = useCustomizationStore(state => state.textContent)
+  const numberContent = useCustomizationStore(state => state.numberContent)
   const textColor = useCustomizationStore(state => state.textColor)
   const fontSize = useCustomizationStore(state => state.fontSize)
   const textPosition = useCustomizationStore(state => state.textPosition)
@@ -16,6 +17,7 @@ export const TextControls = memo(() => {
   const transformMode = useCustomizationStore(state => state.transformMode)
   
   const setTextContent = useCustomizationStore(state => state.setTextContent)
+  const setNumberContent = useCustomizationStore(state => state.setNumberContent)
   const setTextColor = useCustomizationStore(state => state.setTextColor)
   const setFontSize = useCustomizationStore(state => state.setFontSize)
   const setTextPosition = useCustomizationStore(state => state.setTextPosition)
@@ -41,7 +43,7 @@ export const TextControls = memo(() => {
       </div>
 
       {/* ── Selection & Transform Mode ── */}
-      {textContent && (
+      {(textContent || numberContent) && (
         <div className="control-group">
           <button
             className={`btn-select ${isSelected ? 'active text' : 'inactive'}`}
@@ -67,6 +69,22 @@ export const TextControls = memo(() => {
           value={textContent}
           onChange={(e) => setTextContent(e.target.value)}
           placeholder="Enter your text…"
+        />
+      </div>
+
+      {/* ── Number Input ── */}
+      <div className="control-group">
+        <div className="control-header">
+          <label className="control-label">Number Input</label>
+          <button className="btn-reset" onClick={() => setNumberContent('')}>Clear</button>
+        </div>
+        <input
+          type="text"
+          maxLength="3"
+          className="premium-input"
+          value={numberContent}
+          onChange={(e) => setNumberContent(e.target.value.replace(/[^0-9]/g, ''))}
+          placeholder="Enter jersey number (e.g. 07, 23)…"
         />
       </div>
 
