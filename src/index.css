@@ -137,7 +137,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 24px;
+  padding: var(--space-lg);
   overflow-y: auto;
   overflow-x: hidden;
   box-sizing: border-box;
