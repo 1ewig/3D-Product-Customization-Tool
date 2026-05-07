@@ -76,9 +76,9 @@ export const HandlesPanel = memo(() => {
       </div>
 
       {/* ── Section 1: Overlay Layers Selector ── */}
-      <div className="control-group border-bottom p-b-20">
+      <div className="control-group">
         <label className="control-label uppercase tracking">Customizable Overlay Layers</label>
-        <div className="layer-stack m-t-12">
+        <div className="layer-stack">
           {/* Layer 1: Text */}
           <button
             className={`layer-item ${selectedObject === 'text' ? 'active text' : ''}`}
@@ -130,7 +130,7 @@ export const HandlesPanel = memo(() => {
       </div>
 
       {/* ── Section 2: Active Sliders ── */}
-      <div className="control-group flex-1">
+      <div className="control-group flex-grow">
         {!hasSelection ? (
           <div className="empty-selection-placeholder">
             <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="placeholder-icon">
@@ -169,7 +169,7 @@ export const HandlesPanel = memo(() => {
             )}
 
             {/* 2. Position X */}
-            <div className="transform-slider-group m-t-14">
+            <div className="transform-slider-group">
               <div className="control-header">
                 <label className="control-label text-xs">Horizontal (X) Position: {(activeType === 'text' ? textPosition.x : activeType === 'number' ? numberPosition.x : logoPosition.x).toFixed(2)}</label>
               </div>
@@ -190,7 +190,7 @@ export const HandlesPanel = memo(() => {
             </div>
 
             {/* 3. Position Y */}
-            <div className="transform-slider-group m-t-14">
+            <div className="transform-slider-group">
               <div className="control-header">
                 <label className="control-label text-xs">Vertical (Y) Position: {(activeType === 'text' ? textPosition.y : activeType === 'number' ? numberPosition.y : logoPosition.y).toFixed(2)}</label>
               </div>
@@ -211,7 +211,7 @@ export const HandlesPanel = memo(() => {
             </div>
 
             {/* 4. Rotation */}
-            <div className="transform-slider-group m-t-14">
+            <div className="transform-slider-group">
               <div className="control-header">
                 <label className="control-label text-xs">Rotation: {(activeType === 'text' ? textRotation : activeType === 'number' ? numberRotation : logoRotation).toFixed(2)} rad</label>
               </div>
@@ -232,7 +232,7 @@ export const HandlesPanel = memo(() => {
             </div>
 
             {/* 5. Scale */}
-            <div className="transform-slider-group m-t-14">
+            <div className="transform-slider-group">
               <div className="control-header">
                 <label className="control-label text-xs">Overall Scale: {(activeType === 'text' ? textScale : activeType === 'number' ? numberScale : logoScale).toFixed(2)}x</label>
               </div>
@@ -258,11 +258,11 @@ export const HandlesPanel = memo(() => {
       {/* ── Section 3: Global Action Footers ── */}
       <div className="handles-footer">
         <button 
-          className="btn-footer secondary m-b-12"
+          className="btn-footer secondary"
           onClick={handleDownload}
           disabled={isSaving}
         >
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="m-r-6">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7 10 12 15 17 10" />
             <line x1="12" y1="15" x2="12" y2="3" />
@@ -278,7 +278,7 @@ export const HandlesPanel = memo(() => {
             'Saving to Cloud…'
           ) : (
             <>
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="m-r-6">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
                 <polyline points="17 21 17 13 7 13 7 21" />
                 <polyline points="7 3 7 8 15 8" />

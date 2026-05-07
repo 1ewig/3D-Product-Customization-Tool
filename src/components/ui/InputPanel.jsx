@@ -65,9 +65,9 @@ export const InputPanel = memo(() => {
       </div>
 
       {/* ── Section 1: Product Selection ── */}
-      <div className="control-group border-bottom p-b-20">
+      <div className="control-group">
         <label className="control-label uppercase tracking">Select Product Model</label>
-        <div className="product-grid m-t-12">
+        <div className="product-grid">
           {BUILTIN_MODELS.map((model, idx) => {
             const isActive = !customModelUrl && currentModelIndex === idx
             return (
@@ -100,9 +100,9 @@ export const InputPanel = memo(() => {
       </div>
 
       {/* ── Section 2: Text Styling ── */}
-      <div className="control-group border-bottom p-b-20 p-t-10">
+      <div className="control-group">
         <label className="control-label uppercase tracking">Player Name / Text</label>
-        <div className="flex gap-12 m-t-12">
+        <div className="flex spacing-md">
           <input
             type="text"
             className="premium-input flex-1"
@@ -122,9 +122,9 @@ export const InputPanel = memo(() => {
       </div>
 
       {/* ── Section 3: Number Styling ── */}
-      <div className="control-group border-bottom p-b-20 p-t-10">
+      <div className="control-group">
         <label className="control-label uppercase tracking">Jersey Number</label>
-        <div className="flex gap-12 m-t-12">
+        <div className="flex spacing-md">
           <input
             type="text"
             maxLength="3"
@@ -145,12 +145,12 @@ export const InputPanel = memo(() => {
       </div>
 
       {/* ── Section 4: Image/Logo Styling ── */}
-      <div className="control-group border-bottom p-b-20 p-t-10">
+      <div className="control-group">
         <div className="control-header">
           <label className="control-label uppercase tracking">Team Logo Image</label>
           {logoUrl && <button className="btn-reset" onClick={() => setLogoUrl(null)}>Remove</button>}
         </div>
-        <div className="flex gap-12 m-t-12">
+        <div className="flex spacing-md">
           <button 
             className="premium-input flex-1 upload-logo-btn text-left" 
             onClick={() => logoInputRef.current?.click()}
@@ -168,11 +168,11 @@ export const InputPanel = memo(() => {
       </div>
 
       {/* ── Section 5: Saved Library ── */}
-      <div className="control-group p-t-10 flex-1">
+      <div className="control-group flex-grow">
         <label className="control-label uppercase tracking">Saved Designs Library</label>
-        <div className="library-content-area m-t-12">
+        <div className="library-content-area">
           {isLoading ? (
-            <div className="text-muted-sm p-t-10">Loading library...</div>
+            <div className="text-muted-sm">Loading library...</div>
           ) : designs?.length > 0 ? (
             <div className="library-mini-list">
               {designs.map((design) => (
@@ -203,7 +203,7 @@ export const InputPanel = memo(() => {
               ))}
             </div>
           ) : (
-            <div className="text-muted-sm italic p-t-10">
+            <div className="text-muted-sm italic">
               No designs saved yet. Hit "Save Design" on the right to store them.
             </div>
           )}
