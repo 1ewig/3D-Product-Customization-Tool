@@ -115,6 +115,35 @@ export const SceneCanvas = () => {
             <ShirtModel />
           </Center>
 
+          {/* Holographic 3D Bounding Outline Box */}
+          <lineSegments scale={[1.6, 1.6, 1.6]}>
+            <edgesGeometry attach="geometry">
+              <boxGeometry args={[1, 1, 1]} />
+            </edgesGeometry>
+            <lineBasicMaterial
+              attach="material"
+              color="#3b82f6"
+              transparent
+              opacity={0.15}
+              depthWrite={false}
+              linewidth={1.5}
+            />
+          </lineSegments>
+
+          {/* Subtly illuminated Ground Studio Grid */}
+          <gridHelper
+            args={[8, 16, '#3b82f6', '#3b82f6']}
+            position={[0, -0.85, 0]}
+          >
+            <lineBasicMaterial
+              attach="material"
+              color="#3b82f6"
+              transparent
+              opacity={0.06}
+              depthWrite={false}
+            />
+          </gridHelper>
+
           {/* Overlays */}
           {textContent && <TextOverlay ref={textRefCallback} />}
           {logoUrl && (
