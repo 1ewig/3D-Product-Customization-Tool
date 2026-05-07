@@ -537,7 +537,7 @@ body {
 }
 
 .control-group + .control-group {
-  margin-top: var(--space-xl);
+  margin-top: var(--space-sm);
 }
 
 .control-group.flex-grow {
@@ -551,7 +551,7 @@ body {
 
 .control-group .control-label,
 .control-group .control-header {
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-xs);
 }
 
 .control-header {
