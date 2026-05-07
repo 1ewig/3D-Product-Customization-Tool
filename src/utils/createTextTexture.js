@@ -14,7 +14,7 @@ export const createTextTexture = (text, fontSize, color, existingCanvas = null) 
   
   // High-res canvas for crisp text
   canvas.width = 1024;
-  canvas.height = 512;
+  canvas.height = 256;
 
   // Clear background (transparent)
   context.clearRect(0, 0, canvas.width, canvas.height);

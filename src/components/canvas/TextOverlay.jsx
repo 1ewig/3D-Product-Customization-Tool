@@ -91,7 +91,7 @@ export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
         scale={[textScale, textScale, textScale]}
         visible={false}
       >
-        <boxGeometry args={[0.5, 0.25, 0.5]} />
+        <boxGeometry args={[0.5, 0.125, 0.5]} />
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
 
@@ -108,14 +108,14 @@ export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
         const localPos = mesh.worldToLocal(worldPos.clone())
 
         // 2. Adjust local scale relative to target mesh's actual world scale.
-        // The canvas is rendered in a 2:1 aspect ratio, so we scale the Y height by 0.5
+        // The canvas is rendered in a 4:1 aspect ratio, so we scale the Y height by 0.25
         // relative to the uniform textScale width to keep the letters perfectly proportioned.
         const targetWorldScale = new THREE.Vector3()
         mesh.getWorldScale(targetWorldScale)
 
         const localScale = new THREE.Vector3(
           textScale / targetWorldScale.x,
-          (textScale * 0.5) / targetWorldScale.y,
+          (textScale * 0.25) / targetWorldScale.y,
           0.6 // Thickness depth of projection box to capture curved surfaces cleanly
         )
 
