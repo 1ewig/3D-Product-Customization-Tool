@@ -19,7 +19,7 @@ export const HandlesPanel = memo(() => {
   const setTextPosition = useCustomizationStore(state => state.setTextPosition)
   const setTextRotation = useCustomizationStore(state => state.setTextRotation)
   const setTextScale = useCustomizationStore(state => state.setTextScale)
-  const resetText = useCustomizationStore(state => state.resetText)
+  const resetTextTransform = useCustomizationStore(state => state.resetTextTransform)
 
   // Subscriptions for Number
   const numberContent = useCustomizationStore(state => state.numberContent)
@@ -31,7 +31,7 @@ export const HandlesPanel = memo(() => {
   const setNumberPosition = useCustomizationStore(state => state.setNumberPosition)
   const setNumberRotation = useCustomizationStore(state => state.setNumberRotation)
   const setNumberScale = useCustomizationStore(state => state.setNumberScale)
-  const resetNumber = useCustomizationStore(state => state.resetNumber)
+  const resetNumberTransform = useCustomizationStore(state => state.resetNumberTransform)
 
   // Subscriptions for Logo
   const logoUrl = useCustomizationStore(state => state.logoUrl)
@@ -41,7 +41,7 @@ export const HandlesPanel = memo(() => {
   const setLogoPosition = useCustomizationStore(state => state.setLogoPosition)
   const setLogoRotation = useCustomizationStore(state => state.setLogoRotation)
   const setLogoScale = useCustomizationStore(state => state.setLogoScale)
-  const resetLogo = useCustomizationStore(state => state.resetLogo)
+  const resetLogoTransform = useCustomizationStore(state => state.resetLogoTransform)
 
   // ─── DELEGATED SAVE/DOWNLOAD ACTIONS ───────────────────────────────────────
   const { isSaving, handleSave, handleDownload } = useConfiguratorActions()
@@ -56,15 +56,15 @@ export const HandlesPanel = memo(() => {
 
   if (selectedObject === 'text') {
     activeName = 'Text Overlay'
-    activeReset = resetText
+    activeReset = resetTextTransform
     activeType = 'text'
   } else if (selectedObject === 'number') {
     activeName = 'Jersey Number Overlay'
-    activeReset = resetNumber
+    activeReset = resetNumberTransform
     activeType = 'number'
   } else if (selectedObject === 'logo') {
     activeName = 'Logo Image Overlay'
-    activeReset = resetLogo
+    activeReset = resetLogoTransform
     activeType = 'logo'
   }
 

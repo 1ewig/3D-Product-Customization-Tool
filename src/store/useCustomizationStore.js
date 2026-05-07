@@ -125,6 +125,13 @@ export const useCustomizationStore = create(
         selectedObject: null
       }),
 
+      resetTextTransform: () => set({
+        fontSize: 48,
+        textPosition: { x: 0, y: 0.15, z: 0 },
+        textRotation: 0,
+        textScale: 1
+      }),
+
       resetNumber: () => set({
         numberContent: '07',
         numberColor: '#000000',
@@ -135,12 +142,25 @@ export const useCustomizationStore = create(
         selectedObject: null
       }),
 
+      resetNumberTransform: () => set({
+        numberFontSize: 72,
+        numberPosition: { x: 0, y: -0.15, z: 0 },
+        numberRotation: 0,
+        numberScale: 0.8
+      }),
+
       resetLogo: () => set({
         logoUrl: defaultLogo,
         logoPosition: { x: 0, y: -0.1, z: 0 },
         logoRotation: 0,
         logoScale: 0.6,
         selectedObject: null
+      }),
+
+      resetLogoTransform: () => set({
+        logoPosition: { x: 0, y: -0.1, z: 0 },
+        logoRotation: 0,
+        logoScale: 0.6
       }),
 
       resetModel: () => set({
