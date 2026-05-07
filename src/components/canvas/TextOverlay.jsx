@@ -119,20 +119,23 @@ export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
           0.6 // Thickness depth of projection box to capture curved surfaces cleanly
         )
 
-        return createPortal(
-          <Decal
-            mesh={{ current: mesh }}
-            position={[localPos.x, localPos.y, localPos.z]}
-            rotation={[0, 0, textRotation]}
-            scale={[localScale.x, localScale.y, localScale.z]}
-            map={texture}
-            transparent
-            depthTest={true}
-            depthWrite={false}
-            side={THREE.FrontSide}
-          />,
-          mesh,
-          mesh.uuid
+        return (
+          <group key={mesh.uuid}>
+            {createPortal(
+              <Decal
+                mesh={{ current: mesh }}
+                position={[localPos.x, localPos.y, localPos.z]}
+                rotation={[0, 0, textRotation]}
+                scale={[localScale.x, localScale.y, localScale.z]}
+                map={texture}
+                transparent
+                depthTest={true}
+                depthWrite={false}
+                side={THREE.FrontSide}
+              />,
+              mesh
+            )}
+          </group>
         )
       })}
     </>
