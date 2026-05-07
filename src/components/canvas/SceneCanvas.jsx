@@ -183,6 +183,7 @@ export const SceneCanvas = () => {
             <TransformControls
               object={textMeshRef.current}
               mode={transformMode}
+              showZ={false}
               onMouseDown={handleDragStart}
               onMouseUp={handleDragEnd}
               onChange={handleTransformChange}
@@ -193,6 +194,7 @@ export const SceneCanvas = () => {
             <TransformControls
               object={numberMeshRef.current}
               mode={transformMode}
+              showZ={false}
               onMouseDown={handleDragStart}
               onMouseUp={handleDragEnd}
               onChange={handleTransformChange}
@@ -203,6 +205,7 @@ export const SceneCanvas = () => {
             <TransformControls
               object={logoMeshRef.current}
               mode={transformMode}
+              showZ={false}
               onMouseDown={handleDragStart}
               onMouseUp={handleDragEnd}
               onChange={handleTransformChange}
