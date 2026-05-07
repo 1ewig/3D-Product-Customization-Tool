@@ -140,36 +140,7 @@ export const SceneCanvas = () => {
             <ShirtModel />
           </Center>
 
-          {/* Holographic 3D Solid Translucent Display Box */}
-          <mesh scale={[1.6, 1.6, 1.6]}>
-            <boxGeometry args={[1, 1, 1]} />
-            <meshPhysicalMaterial
-              color="#3b82f6"
-              transparent
-              opacity={0.03}
-              roughness={0.2}
-              metalness={0.1}
-              transmission={0.5}
-              thickness={0.3}
-              side={2} // THREE.DoubleSide
-              depthWrite={false}
-            />
-          </mesh>
 
-          {/* Holographic 3D Bounding Outline Box */}
-          <lineSegments scale={[1.6, 1.6, 1.6]}>
-            <edgesGeometry attach="geometry">
-              <boxGeometry args={[1, 1, 1]} />
-            </edgesGeometry>
-            <lineBasicMaterial
-              attach="material"
-              color="#3b82f6"
-              transparent
-              opacity={0.15}
-              depthWrite={false}
-              linewidth={1.5}
-            />
-          </lineSegments>
 
           {/* Subtly illuminated Ground Studio Grid */}
           <gridHelper
