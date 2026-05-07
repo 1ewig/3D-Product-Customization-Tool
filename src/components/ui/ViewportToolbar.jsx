@@ -7,6 +7,8 @@ export const ViewportToolbar = ({ orbitRef }) => {
   const setCurrentModelIndex = useCustomizationStore(state => state.setCurrentModelIndex)
   const customModelUrl = useCustomizationStore(state => state.customModelUrl)
   const setCustomModelUrl = useCustomizationStore(state => state.setCustomModelUrl)
+  const setTextContent = useCustomizationStore(state => state.setTextContent)
+  const setLogoUrl = useCustomizationStore(state => state.setLogoUrl)
 
   const handleReset = () => {
     if (orbitRef.current) {
@@ -38,6 +40,12 @@ export const ViewportToolbar = ({ orbitRef }) => {
     }
     const nextIndex = (currentModelIndex + 1) % BUILTIN_MODELS.length
     setCurrentModelIndex(nextIndex)
+    
+    // Clear dynamic text and logo overlays when cycling models
+    setTextContent('')
+    setLogoUrl(null)
+    setSelectedObject(null)
+
     toast.success(`Active Model: ${BUILTIN_MODELS[nextIndex].name}`, {
       icon: '👕',
       id: 'model-cycle-toast'
