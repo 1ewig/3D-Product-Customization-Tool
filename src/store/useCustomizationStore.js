@@ -59,12 +59,19 @@ export const useCustomizationStore = create(
 
       // ─── TEXT STATE ────────────────────────────────────────────────────────
       textContent: 'CHAMPRO',              // Current text content
-      numberContent: '07',                // Current player number content
       textColor: '#000000',               // Hex color of the text
       fontSize: 48,                       // Initial font size
       textPosition: { x: 0, y: 0.15, z: 0 }, // 3D coordinates for text placement
       textRotation: 0,                    // Rotation in radians
       textScale: 1,                       // Scale multiplier
+
+      // ─── NUMBER STATE ──────────────────────────────────────────────────────
+      numberContent: '07',                // Current player number content
+      numberColor: '#000000',             // Hex color of the number
+      numberFontSize: 72,                 // Initial number font size
+      numberPosition: { x: 0, y: -0.15, z: 0 }, // 3D coordinates for number placement (positioned lower)
+      numberRotation: 0,                  // Rotation in radians
+      numberScale: 0.8,                   // Scale multiplier
 
       // ─── LOGO STATE ────────────────────────────────────────────────────────
       logoUrl: defaultLogo,               // Image URL (Remote or Base64)
@@ -73,9 +80,9 @@ export const useCustomizationStore = create(
       logoScale: 0.6,                     // Scale multiplier
 
       // ─── UI / INTERACTION STATE ────────────────────────────────────────────
-      selectedObject: null,               // Currently selected for transform (null | 'text' | 'logo')
+      selectedObject: null,               // Currently selected for transform (null | 'text' | 'number' | 'logo')
       transformMode: 'translate',         // Transformation mode ('translate' | 'rotate' | 'scale')
-      activeTab: 'text',                  // Active sidebar tab ('text' | 'image' | 'library')
+      activeTab: 'text',                  // Active sidebar tab ('text' | 'number' | 'image' | 'library')
 
       // ─── SETTERS ───────────────────────────────────────────────────────────
       setCustomModelUrl: (customModelUrl) => set({ customModelUrl }),
@@ -84,12 +91,18 @@ export const useCustomizationStore = create(
       setHighlightedMeshUuid: (highlightedMeshUuid) => set({ highlightedMeshUuid }),
       
       setTextContent: (textContent) => set({ textContent }),
-      setNumberContent: (numberContent) => set({ numberContent }),
       setTextColor: (textColor) => set({ textColor }),
       setFontSize: (fontSize) => set({ fontSize }),
       setTextPosition: (textPosition) => set({ textPosition }),
       setTextRotation: (textRotation) => set({ textRotation }),
       setTextScale: (textScale) => set({ textScale }),
+
+      setNumberContent: (numberContent) => set({ numberContent }),
+      setNumberColor: (numberColor) => set({ numberColor }),
+      setNumberFontSize: (numberFontSize) => set({ numberFontSize }),
+      setNumberPosition: (numberPosition) => set({ numberPosition }),
+      setNumberRotation: (numberRotation) => set({ numberRotation }),
+      setNumberScale: (numberScale) => set({ numberScale }),
       
       setLogoUrl: (logoUrl) => set({ logoUrl }),
       setLogoPosition: (logoPosition) => set({ logoPosition }),
@@ -104,12 +117,21 @@ export const useCustomizationStore = create(
       
       resetText: () => set({
         textContent: 'CHAMPRO',
-        numberContent: '07',
         textColor: '#000000',
         fontSize: 48,
         textPosition: { x: 0, y: 0.15, z: 0 },
         textRotation: 0,
         textScale: 1,
+        selectedObject: null
+      }),
+
+      resetNumber: () => set({
+        numberContent: '07',
+        numberColor: '#000000',
+        numberFontSize: 72,
+        numberPosition: { x: 0, y: -0.15, z: 0 },
+        numberRotation: 0,
+        numberScale: 0.8,
         selectedObject: null
       }),
 

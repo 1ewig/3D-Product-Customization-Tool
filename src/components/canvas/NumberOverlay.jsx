@@ -1,6 +1,6 @@
 /**
- * Text Overlay Component
- * Projects a dynamically-generated HTML5 Canvas text texture directly onto
+ * Number Overlay Component
+ * Projects a dynamically-generated HTML5 Canvas number texture directly onto
  * the surface of the target 3D model mesh.
  * Employs the Invisible Proxy Anchor pattern to cleanly decouple TransformControls 
  * gizmo interactions from the Drei <Decal> projection system.
@@ -13,14 +13,14 @@ import { Decal } from '@react-three/drei'
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 import { createTextTexture } from '../../utils/createTextTexture'
 
-export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
+export const NumberOverlay = memo(forwardRef(function NumberOverlay(_, ref) {
   // ─── SELECTIVE STORE SUBSCRIPTIONS ─────────────────────────────────────────
-  const textContent = useCustomizationStore(state => state.textContent)
-  const textColor = useCustomizationStore(state => state.textColor)
-  const fontSize = useCustomizationStore(state => state.fontSize)
-  const textPosition = useCustomizationStore(state => state.textPosition)
-  const textRotation = useCustomizationStore(state => state.textRotation)
-  const textScale = useCustomizationStore(state => state.textScale)
+  const numberContent = useCustomizationStore(state => state.numberContent)
+  const numberColor = useCustomizationStore(state => state.numberColor)
+  const numberFontSize = useCustomizationStore(state => state.numberFontSize)
+  const numberPosition = useCustomizationStore(state => state.numberPosition)
+  const numberRotation = useCustomizationStore(state => state.numberRotation)
+  const numberScale = useCustomizationStore(state => state.numberScale)
   const modelMeshes = useCustomizationStore(state => state.modelMeshes)
 
   const [texture, setTexture] = useState(null)
@@ -28,19 +28,19 @@ export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
 
   // ─── CANVAS TEXTURE GENERATION ──────────────────────────────────────────────
   useEffect(() => {
-    if (!textContent) return
+    if (!numberContent) return
 
     if (!texture) {
       // Create texture for the first time
-      const tex = createTextTexture(textContent, fontSize, textColor)
+      const tex = createTextTexture(numberContent, numberFontSize, numberColor)
       canvasRef.current = tex.image
       setTexture(tex)
     } else {
       // In-place context update for speed and performance
-      createTextTexture(textContent, fontSize, textColor, canvasRef.current)
+      createTextTexture(numberContent, numberFontSize, numberColor, canvasRef.current)
       texture.needsUpdate = true
     }
-  }, [textContent, textColor, fontSize, texture])
+  }, [numberContent, numberColor, numberFontSize, texture])
 
   // Clean up texture when overlay unmounts
   useEffect(() => {
@@ -74,21 +74,21 @@ export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
   }, [scene, modelMeshes])
 
   // Ensure content is loaded, a texture exists, and at least one valid target mesh exists in the scene
-  if (!textContent || !texture || targetMeshes.length === 0) return null
+  if (!numberContent || !texture || targetMeshes.length === 0) return null
 
   return (
     <>
       {/* 
         INVISIBLE PROXY ANCHOR
-        Placed in world space at the exact position/rotation/scale of the text.
+        Placed in world space at the exact position/rotation/scale of the number.
         TransformControls attaches to this mesh, allowing seamless gizmo manipulation 
         without dirtying the decal geometry during dragging.
       */}
       <mesh
         ref={ref}
-        position={[textPosition.x, textPosition.y, 0]}
-        rotation={[0, 0, textRotation]}
-        scale={[textScale, textScale, textScale]}
+        position={[numberPosition.x, numberPosition.y, 0]}
+        rotation={[0, 0, numberRotation]}
+        scale={[numberScale, numberScale, numberScale]}
         visible={false}
       >
         <boxGeometry args={[0.5, 0.125, 0.5]} />
@@ -102,20 +102,16 @@ export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
       */}
       {targetMeshes.map((mesh) => {
         // 1. Convert world-space coordinates into this mesh's local space
-        // We lock the Z coordinate to 0 (the center of the model) to prevent the decal 
-        // from being pulled away from the mesh surface.
-        const worldPos = new THREE.Vector3(textPosition.x, textPosition.y, 0)
+        const worldPos = new THREE.Vector3(numberPosition.x, numberPosition.y, 0)
         const localPos = mesh.worldToLocal(worldPos.clone())
 
         // 2. Adjust local scale relative to target mesh's actual world scale.
-        // The canvas is rendered in a 4:1 aspect ratio, so we scale the Y height by 0.25
-        // relative to the uniform textScale width to keep the letters perfectly proportioned.
         const targetWorldScale = new THREE.Vector3()
         mesh.getWorldScale(targetWorldScale)
 
         const localScale = new THREE.Vector3(
-          textScale / targetWorldScale.x,
-          (textScale * 0.25) / targetWorldScale.y,
+          numberScale / targetWorldScale.x,
+          (numberScale * 0.25) / targetWorldScale.y,
           0.6 // Thickness depth of projection box to capture curved surfaces cleanly
         )
 
@@ -125,7 +121,7 @@ export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
               <Decal
                 mesh={{ current: mesh }}
                 position={[localPos.x, localPos.y, localPos.z]}
-                rotation={[0, 0, textRotation]}
+                rotation={[0, 0, numberRotation]}
                 scale={[localScale.x, localScale.y, localScale.z]}
                 map={texture}
                 transparent

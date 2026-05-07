@@ -9,6 +9,7 @@ import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Center, PerspectiveCamera, TransformControls } from '@react-three/drei'
 import { ShirtModel } from './ShirtModel'
 import { TextOverlay } from './TextOverlay'
+import { NumberOverlay } from './NumberOverlay'
 import { LogoOverlay } from './LogoOverlay'
 import { ViewportToolbar, MeshDebugger } from '../ui'
 import { useCustomizationStore } from '../../store/useCustomizationStore'
@@ -17,10 +18,12 @@ export const SceneCanvas = () => {
   // ─── REFS ──────────────────────────────────────────────────────────────────
   const orbitRef = useRef()        // Reference to OrbitControls to enable/disable during drag
   const textMeshRef = useRef()     // Reference to the text overlay mesh for TransformControls
+  const numberMeshRef = useRef()   // Reference to the player number overlay mesh for TransformControls
   const logoMeshRef = useRef()     // Reference to the logo overlay mesh for TransformControls
 
   // Local state to track when overlays are actually rendered in the DOM/Scene
   const [textMounted, setTextMounted] = useState(false)
+  const [numberMounted, setNumberMounted] = useState(false)
   const [logoMounted, setLogoMounted] = useState(false)
 
   // ─── STORE STATE ───────────────────────────────────────────────────────────
@@ -28,11 +31,17 @@ export const SceneCanvas = () => {
   const setSelectedObject = useCustomizationStore(state => state.setSelectedObject)
   const transformMode = useCustomizationStore(state => state.transformMode)
   const textContent = useCustomizationStore(state => state.textContent)
+  const numberContent = useCustomizationStore(state => state.numberContent)
   const logoUrl = useCustomizationStore(state => state.logoUrl)
   
   const setTextPosition = useCustomizationStore(state => state.setTextPosition)
   const setTextRotation = useCustomizationStore(state => state.setTextRotation)
   const setTextScale = useCustomizationStore(state => state.setTextScale)
+
+  const setNumberPosition = useCustomizationStore(state => state.setNumberPosition)
+  const setNumberRotation = useCustomizationStore(state => state.setNumberRotation)
+  const setNumberScale = useCustomizationStore(state => state.setNumberScale)
+
   const setLogoPosition = useCustomizationStore(state => state.setLogoPosition)
   const setLogoRotation = useCustomizationStore(state => state.setLogoRotation)
   const setLogoScale = useCustomizationStore(state => state.setLogoScale)
@@ -47,13 +56,23 @@ export const SceneCanvas = () => {
       setTextPosition({ x: +m.position.x.toFixed(3), y: +m.position.y.toFixed(3), z: +m.position.z.toFixed(3) })
       setTextRotation(+m.rotation.z.toFixed(3))
       setTextScale(+m.scale.x.toFixed(3))
+    } else if (selectedObject === 'number' && numberMeshRef.current) {
+      const m = numberMeshRef.current
+      setNumberPosition({ x: +m.position.x.toFixed(3), y: +m.position.y.toFixed(3), z: +m.position.z.toFixed(3) })
+      setNumberRotation(+m.rotation.z.toFixed(3))
+      setNumberScale(+m.scale.x.toFixed(3))
     } else if (selectedObject === 'logo' && logoMeshRef.current) {
       const m = logoMeshRef.current
       setLogoPosition({ x: +m.position.x.toFixed(3), y: +m.position.y.toFixed(3), z: +m.position.z.toFixed(3) })
       setLogoRotation(+m.rotation.z.toFixed(3))
       setLogoScale(+m.scale.x.toFixed(3))
     }
-  }, [selectedObject, setTextPosition, setTextRotation, setTextScale, setLogoPosition, setLogoRotation, setLogoScale])
+  }, [
+    selectedObject,
+    setTextPosition, setTextRotation, setTextScale,
+    setNumberPosition, setNumberRotation, setNumberScale,
+    setLogoPosition, setLogoRotation, setLogoScale
+  ])
 
 
   // Disable camera rotation while the user is dragging the gizmo
@@ -78,6 +97,11 @@ export const SceneCanvas = () => {
     setTextMounted(!!node)
   }, [])
 
+  const numberRefCallback = useCallback((node) => {
+    numberMeshRef.current = node
+    setNumberMounted(!!node)
+  }, [])
+
   const logoRefCallback = useCallback((node) => {
     logoMeshRef.current = node
     setLogoMounted(!!node)
@@ -85,6 +109,7 @@ export const SceneCanvas = () => {
 
   // Visibility logic for Transform Gizmos
   const showTextGizmo = selectedObject === 'text' && textContent && textMounted && textMeshRef.current
+  const showNumberGizmo = selectedObject === 'number' && numberContent && numberMounted && numberMeshRef.current
   const showLogoGizmo = selectedObject === 'logo' && logoUrl && logoMounted && logoMeshRef.current
 
   return (
@@ -146,6 +171,7 @@ export const SceneCanvas = () => {
 
           {/* Overlays */}
           {textContent && <TextOverlay ref={textRefCallback} />}
+          {numberContent && <NumberOverlay ref={numberRefCallback} />}
           {logoUrl && (
             <Suspense fallback={null}>
               <LogoOverlay ref={logoRefCallback} />
@@ -156,6 +182,16 @@ export const SceneCanvas = () => {
           {showTextGizmo && (
             <TransformControls
               object={textMeshRef.current}
+              mode={transformMode}
+              onMouseDown={handleDragStart}
+              onMouseUp={handleDragEnd}
+              onChange={handleTransformChange}
+            />
+          )}
+
+          {showNumberGizmo && (
+            <TransformControls
+              object={numberMeshRef.current}
               mode={transformMode}
               onMouseDown={handleDragStart}
               onMouseUp={handleDragEnd}

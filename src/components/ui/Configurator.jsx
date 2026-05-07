@@ -1,11 +1,12 @@
 /**
  * Configurator Sidebar Component
- * This is the main UI hub that holds the tabs for Text, Image, and Library.
+ * This is the main UI hub that holds the tabs for Text, Number, Image, and Library.
  * Handles the visual rendering of tabs and footers, delegating interaction actions.
  */
 
 import { useCustomizationStore } from '../../store/useCustomizationStore'
 import { TextControls } from './TextControls'
+import { NumberControls } from './NumberControls'
 import { LogoControls } from './LogoControls'
 import { LibrarySidebar } from './LibrarySidebar'
 import { useConfiguratorActions } from '../../hooks'
@@ -27,6 +28,7 @@ export const Configurator = () => {
   return (
     <div className="glass-panel h-full flex-column">
       <div className="tab-container">
+        {/* Text Tab */}
         <button 
           className={`tab-item ${activeTab === 'text' ? 'active text' : ''}`}
           onClick={() => setActiveTab('text')}
@@ -38,6 +40,22 @@ export const Configurator = () => {
           </svg>
           Text
         </button>
+
+        {/* Number Tab */}
+        <button 
+          className={`tab-item ${activeTab === 'number' ? 'active number' : ''}`}
+          onClick={() => setActiveTab('number')}
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="4" y1="9" x2="20" y2="9" />
+            <line x1="4" y1="15" x2="20" y2="15" />
+            <line x1="10" y1="3" x2="8" y2="21" />
+            <line x1="16" y1="3" x2="14" y2="21" />
+          </svg>
+          Number
+        </button>
+
+        {/* Image/Logo Tab */}
         <button 
           className={`tab-item ${activeTab === 'image' ? 'active image' : ''}`}
           onClick={() => setActiveTab('image')}
@@ -49,6 +67,8 @@ export const Configurator = () => {
           </svg>
           Image
         </button>
+
+        {/* Library Tab */}
         <button 
           className={`tab-item ${activeTab === 'library' ? 'active library' : ''}`}
           onClick={() => setActiveTab('library')}
@@ -62,6 +82,7 @@ export const Configurator = () => {
 
       <div className="flex-1 overflow-y-auto p-24">
         {activeTab === 'text' && <TextControls />}
+        {activeTab === 'number' && <NumberControls />}
         {activeTab === 'image' && <LogoControls />}
         {activeTab === 'library' && <LibrarySidebar />}
       </div>
@@ -75,30 +96,28 @@ export const Configurator = () => {
           ref={modelInputRef}
           onChange={handleModelUpload}
         />
-        
-        <div className="flex-row gap-8">
-          <button 
-            className="btn-select btn-secondary m-0" 
-            onClick={() => modelInputRef.current.click()}
-          >
-            Import GLB
-          </button>
-          <button 
-            className="btn-select btn-secondary m-0" 
-            onClick={handleDownload}
-          >
-            Download
-          </button>
-        </div>
-
         <button 
-          className="btn-select active text btn-primary-large m-0" 
-          onClick={handleSave}
+          className="btn-footer secondary flex-1" 
+          onClick={() => modelInputRef.current?.click()}
           disabled={isSaving}
         >
-          {isSaving ? 'Saving...' : 'Save Design'}
+          Import GLB
+        </button>
+        <button 
+          className="btn-footer secondary flex-1" 
+          onClick={handleDownload}
+          disabled={isSaving}
+        >
+          Download
         </button>
       </div>
+      <button 
+        className="btn-footer primary m-24 m-t-0" 
+        onClick={handleSave}
+        disabled={isSaving}
+      >
+        {isSaving ? 'Saving Design…' : 'Save Design'}
+      </button>
     </div>
   )
 }

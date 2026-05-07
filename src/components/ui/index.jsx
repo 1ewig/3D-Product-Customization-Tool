@@ -1,4 +1,5 @@
 export * from './TextControls'
+export * from './NumberControls'
 export * from './LogoControls'
 export * from './ViewportToolbar'
 export * from './Configurator'
