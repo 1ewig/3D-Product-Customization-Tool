@@ -265,10 +265,7 @@ body {
 .layer-stack {
   display: flex;
   flex-direction: column;
-}
-
-.layer-stack .layer-item+.layer-item {
-  margin-top: var(--space-md);
+  gap: var(--space-sm);
 }
 
 .layer-item {
