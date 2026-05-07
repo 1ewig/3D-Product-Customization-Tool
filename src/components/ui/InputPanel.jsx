@@ -1,5 +1,5 @@
 import { memo, useRef } from 'react'
-import { useCustomizationStore, BUILTIN_MODELS } from '../../store/useCustomizationStore'
+import { useCustomizationStore } from '../../store/useCustomizationStore'
 import { useConfiguratorActions, useLibraryActions } from '../../hooks'
 
 export const InputPanel = memo(() => {
@@ -10,14 +10,12 @@ export const InputPanel = memo(() => {
   const numberColor = useCustomizationStore(state => state.numberColor)
   const logoUrl = useCustomizationStore(state => state.logoUrl)
   const customModelUrl = useCustomizationStore(state => state.customModelUrl)
-  const currentModelIndex = useCustomizationStore(state => state.currentModelIndex)
   
   const setTextContent = useCustomizationStore(state => state.setTextContent)
   const setTextColor = useCustomizationStore(state => state.setTextColor)
   const setNumberContent = useCustomizationStore(state => state.setNumberContent)
   const setNumberColor = useCustomizationStore(state => state.setNumberColor)
   const setLogoUrl = useCustomizationStore(state => state.setLogoUrl)
-  const setCurrentModelIndex = useCustomizationStore(state => state.setCurrentModelIndex)
   const setCustomModelUrl = useCustomizationStore(state => state.setCustomModelUrl)
   const setSelectedObject = useCustomizationStore(state => state.setSelectedObject)
 
@@ -49,14 +47,6 @@ export const InputPanel = memo(() => {
     }
   }
 
-  const handleSelectModel = (index) => {
-    if (customModelUrl) {
-      setCustomModelUrl(null)
-    }
-    setCurrentModelIndex(index)
-    setSelectedObject(null)
-  }
-
   return (
     <div className="input-panel-inner">
       <div className="panel-title-area">
@@ -68,20 +58,6 @@ export const InputPanel = memo(() => {
       <div className="control-group">
         <label className="control-label uppercase tracking">Select Product Model</label>
         <div className="product-grid">
-          {BUILTIN_MODELS.map((model, idx) => {
-            const isActive = !customModelUrl && currentModelIndex === idx
-            return (
-              <button
-                key={model.name}
-                className={`product-card ${isActive ? 'active' : ''}`}
-                onClick={() => handleSelectModel(idx)}
-              >
-                <div className="product-card-dot" />
-                <span>{model.name}</span>
-              </button>
-            )
-          })}
-          {/* Custom GLB Uploader as a Product Card */}
           <button
             className={`product-card ${customModelUrl ? 'active' : ''}`}
             onClick={() => modelInputRef.current?.click()}
