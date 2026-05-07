@@ -78,24 +78,13 @@ export const LogoControls = memo(() => {
         <div className="control-group">
           <button
             className={`btn-select ${isSelected ? 'active logo' : 'inactive'}`}
-            onClick={() => setSelectedObject(isSelected ? null : 'logo')}
+            onClick={() => {
+              setSelectedObject(isSelected ? null : 'logo')
+              setTransformMode('translate')
+            }}
           >
             {isSelected ? '✓ Logo Selected' : '⊕ Select to Transform'}
           </button>
-
-          {isSelected && (
-            <div className="mode-toggle-group">
-              {['translate', 'rotate', 'scale'].map((mode) => (
-                <button
-                  key={mode}
-                  className={`mode-btn ${transformMode === mode ? 'active logo' : ''}`}
-                  onClick={() => setTransformMode(mode)}
-                >
-                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       )}
 

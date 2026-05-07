@@ -45,24 +45,13 @@ export const TextControls = memo(() => {
         <div className="control-group">
           <button
             className={`btn-select ${isSelected ? 'active text' : 'inactive'}`}
-            onClick={() => setSelectedObject(isSelected ? null : 'text')}
+            onClick={() => {
+              setSelectedObject(isSelected ? null : 'text')
+              setTransformMode('translate')
+            }}
           >
             {isSelected ? '✓ Text Selected' : '⊕ Select to Transform'}
           </button>
-
-          {isSelected && (
-            <div className="mode-toggle-group">
-              {['translate', 'rotate', 'scale'].map((mode) => (
-                <button
-                  key={mode}
-                  className={`mode-btn ${transformMode === mode ? 'active text' : ''}`}
-                  onClick={() => setTransformMode(mode)}
-                >
-                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       )}
 
