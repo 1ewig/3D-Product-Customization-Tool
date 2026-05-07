@@ -177,23 +177,23 @@ body {
 /* Product Selection Carousel Grid */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
 }
 
 .product-card {
   background: var(--input-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: 8px;
+  padding: var(--space-sm) var(--space-md);
   color: var(--text-muted);
   cursor: pointer;
   transition: all var(--transition-fast);
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
+  align-items: center;
+  gap: var(--space-sm);
   text-align: left;
+  width: 100%;
 }
 
 .product-card:hover {
