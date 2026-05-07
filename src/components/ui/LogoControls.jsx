@@ -100,13 +100,13 @@ export const LogoControls = memo(() => {
       )}
 
       {/* ── Position ── */}
-      {(['x', 'y', 'z']).map((axis) => (
+      {(['x', 'y']).map((axis) => (
         <div className="control-group" key={`logo-pos-${axis}`}>
           <div className="control-header">
             <label className="control-label">{axis.toUpperCase()} Pos: {logoPosition[axis].toFixed(2)}</label>
             <button
               className="btn-reset"
-              onClick={() => setLogoPosition({ ...logoPosition, [axis]: axis === 'z' ? 0.31 : 0 })}
+              onClick={() => setLogoPosition({ ...logoPosition, [axis]: 0 })}
             >
               Reset
             </button>
@@ -114,8 +114,8 @@ export const LogoControls = memo(() => {
           <input
             type="range"
             className="premium-range"
-            min={axis === 'z' ? '0' : '-1'}
-            max={axis === 'z' ? '1' : '1'}
+            min="-1"
+            max="1"
             step="0.01"
             value={logoPosition[axis]}
             onChange={(e) => setLogoPosition({ ...logoPosition, [axis]: parseFloat(e.target.value) })}

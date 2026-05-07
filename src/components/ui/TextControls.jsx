@@ -112,13 +112,13 @@ export const TextControls = memo(() => {
       </div>
 
       {/* ── Position ── */}
-      {(['x', 'y', 'z']).map((axis) => (
+      {(['x', 'y']).map((axis) => (
         <div className="control-group" key={`text-pos-${axis}`}>
           <div className="control-header">
             <label className="control-label">{axis.toUpperCase()} Pos: {textPosition[axis].toFixed(2)}</label>
             <button
               className="btn-reset"
-              onClick={() => setTextPosition({ ...textPosition, [axis]: axis === 'z' ? 0.3 : 0 })}
+              onClick={() => setTextPosition({ ...textPosition, [axis]: 0 })}
             >
               Reset
             </button>
@@ -126,8 +126,8 @@ export const TextControls = memo(() => {
           <input
             type="range"
             className="premium-range"
-            min={axis === 'z' ? '0' : '-1'}
-            max={axis === 'z' ? '1' : '1'}
+            min="-1"
+            max="1"
             step="0.01"
             value={textPosition[axis]}
             onChange={(e) => setTextPosition({ ...textPosition, [axis]: parseFloat(e.target.value) })}
