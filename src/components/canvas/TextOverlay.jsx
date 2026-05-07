@@ -132,6 +132,8 @@ export const TextOverlay = memo(forwardRef(function TextOverlay(_, ref) {
                 depthTest={true}
                 depthWrite={false}
                 side={THREE.FrontSide}
+                polygonOffset={true}
+                polygonOffsetFactor={-2}
               />,
               mesh
             )}

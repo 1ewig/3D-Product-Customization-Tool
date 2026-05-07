@@ -102,6 +102,8 @@ export const LogoOverlay = memo(forwardRef(function LogoOverlay(_, ref) {
                 depthTest={true}
                 depthWrite={false}
                 side={THREE.FrontSide}
+                polygonOffset={true}
+                polygonOffsetFactor={-1}
               />,
               mesh
             )}
