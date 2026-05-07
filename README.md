@@ -39,13 +39,15 @@ https://3-d-product-customization-tool.vercel.app/
 
 ## 📖 Technical Documentation
 
-### 1. Approach to Texture Mapping
-To ensure "placement accuracy without distortion" as required by the assessment, I implemented a **Dynamic Canvas Texture** approach:
-- **Text**: A 2D off-screen canvas renders the user's text and is converted into a `THREE.CanvasTexture`.
-- **Logo**: Uploaded images are mapped as `THREE.Texture` with transparency support.
-- **Placement**: Instead of standard decals, I utilized **Floating Plane Meshes** with a calculated **Polygon Offset**. This prevents Z-fighting and ensures the overlays remain visible and sharp against the complex geometry of the clothing model while allowing for pixel-perfect interactive manipulation.
+### 1. Advanced Decal Projection & Interaction
+To ensure absolute placement accuracy across curved, multi-mesh 3D surfaces without seams clipping or high-frequency performance bottlenecks, I engineered a custom **Multi-Mesh Decal Projector with an Invisible Proxy Anchor**:
+- **Dynamic Canvas Textures (Text)**: An off-screen HTML5 canvas renders the user's custom text dynamically, which is updated in-place as a `THREE.CanvasTexture` to avoid costly garbage collection and memory reallocation.
+- **Invisible Proxy Anchor Pattern**: Instead of attaching `TransformControls` directly to the active decal geometry (which triggers expensive math and lag during drags), they attach to an invisible world-space proxy box. Gizmo transformations are synced back to the Zustand store, entirely decoupling interaction controls from WebGL geometry generation.
+- **Multi-Mesh Portal Projector**: GLTF models are often split into discrete sub-meshes (collar, sleeves, chest, back). Standard decals disappear or clip if positioned on these seams. This system traverses the model's structure and uses React Three Fiber's `createPortal` to inject and project a Drei `<Decal>` onto *every* active sub-mesh simultaneously.
+- **Local Space & Scale Normalization**: World-space coordinates are dynamically translated to each mesh's local coordinate system via `mesh.worldToLocal()`, and scales are programmatically normalized by dividing the global scale by each mesh's actual world scale (`mesh.getWorldScale()`).
+- **Flickering (Z-fighting) Prevention**: Set a custom thickness depth (`0.6`) for the projection box and configured `depthTest={true}` and `depthWrite={false}` to guarantee the overlays sit perfectly flat on the mesh surface without flickering.
 
-### 2. Challenges & Solutions
+### 2. Technical Challenges & Solutions
 - **Challenge: LocalStorage Write Congestion (Performance)**: 
   - *Problem*: Large designs with Base64 models caused 60fps jitter during slider updates because the store was writing the entire multi-megabyte state to LocalStorage on every frame.
   - *Solution*: Implemented a **Debounced Persistence Wrapper** for the Zustand storage engine, ensuring disk writes only occur after the user finishes their movement.

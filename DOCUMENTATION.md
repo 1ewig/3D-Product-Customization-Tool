@@ -27,14 +27,31 @@ To handle the "Saved Library," I implemented **React Query**.
 
 ---
 
-## Technical Implementation: Texture Mapping
+## Technical Implementation: Multi-Mesh Decal Projection
 
-A core challenge was applying dynamic text and logos to a complex 3D mesh accurately.
+A core challenge was applying dynamic text and logos to a complex, multi-mesh 3D clothing model accurately without distortion, seams clipping, or high-frequency performance bottlenecks.
 
-### The "Floating Mesh" Approach
-While `Decal` components are standard, they often suffer from projection glitches on high-curvature meshes. I implemented a more stable **Custom Plane Overlay** system:
-- **Canvas Textures**: Text is rendered to a hidden 2D HTML5 Canvas, then uploaded as a `THREE.CanvasTexture`.
-- **Z-Buffer Optimization**: To prevent "Z-fighting" (flickering where the overlay meets the shirt), I utilized `polygonOffset` in the Three.js materials. This mathematically pushes the overlay forward in the depth buffer without physically moving its 3D position.
+### The Multi-Mesh Decal Projector & Invisible Proxy Anchor System
+Instead of simple plane overlays or fragile single-mesh decals, I implemented a robust, professional-grade **Decal Projection with Invisible Proxy Anchor and Portals** system:
+
+1. **Invisible Proxy Anchor Pattern**:
+   * Direct manipulation of Drei's `<Decal>` geometry during gizmo dragging often triggers massive render cycles and geometry recalculation lag. 
+   * To solve this, I created an invisible, non-rendering 3D proxy box in world space at the exact target coordinates. 
+   * `TransformControls` attaches exclusively to this proxy anchor. As the user translates, rotates, or scales the gizmo, the coordinates are tracked and saved in the Zustand store, cleanly decoupling interaction math from WebGL geometry generation.
+
+2. **Multi-Mesh Portal Projection**:
+   * A single GLTF model (like a soccer jersey) is typically split into multiple independent sub-meshes (collar, left sleeve, right sleeve, front body, back body). Standard decals will clip or disappear if they overlap the border of these sub-meshes.
+   * My solution traverses the scene to compile all active, visible meshes, ignoring helpers and wireframes.
+   * Using React Three Fiber's `createPortal`, the app dynamically injects and projects a custom `<Decal>` component as a child of **each sub-mesh simultaneously**. This creates a seamless, undivided projection across stitches and mesh seams.
+
+3. **Coordinate & Scale Normalization**:
+   * Because each sub-mesh may have its own local coordinate system and scaling factors, the global world-space coordinates are mathematically normalized:
+     * **Position Translation**: The global position is converted into each mesh's local space via `mesh.worldToLocal()`. The Z coordinate is locked to 0 to prevent the projection box from drifting away from the mesh core.
+     * **Scale Normalization**: The global scale factor is divided by each sub-mesh's actual world scale (`mesh.getWorldScale()`), preventing stretched or shrunk decals on non-uniformly scaled sub-meshes.
+     * **Projection Depth**: The decal projection box depth is set to `0.6` to ensure it cleanly slices through the outer shells of curved surface coordinates.
+
+4. **Flickering & Z-Buffer Optimization**:
+   * To prevent "Z-fighting" (flickering where the decal meets the model's base material), the decals are configured with `depthTest={true}` and `depthWrite={false}`. This guarantees that the decals are rendered cleanly on top of the base mesh material without flickering, even on low-precision rendering loops.
 
 ---
 
