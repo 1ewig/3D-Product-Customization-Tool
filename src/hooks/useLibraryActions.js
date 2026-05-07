@@ -2,6 +2,16 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 import { useCustomizationStore } from '../store/useCustomizationStore'
 
+/**
+ * Custom hook to handle loading and deleting saved designs from the library.
+ * 
+ * @returns {object} An object containing:
+ * - designs: Array of saved designs.
+ * - isLoading: Boolean indicating if designs are being fetched.
+ * - handleLoadDesign: Function to load a design into the editor.
+ * - handleDeleteDesign: Function to delete a design.
+ * - refreshLibrary: Function to manually refresh the list of designs.
+ */
 export const useLibraryActions = () => {
   // ─── STATE & ACTION SELECTIONS ─────────────────────────────────────────────
   const setCustomModelUrl = useCustomizationStore(state => state.setCustomModelUrl)
@@ -12,6 +22,14 @@ export const useLibraryActions = () => {
   const setTextPosition = useCustomizationStore(state => state.setTextPosition)
   const setTextRotation = useCustomizationStore(state => state.setTextRotation)
   const setTextScale = useCustomizationStore(state => state.setTextScale)
+
+  const setNumberContent = useCustomizationStore(state => state.setNumberContent)
+  const setNumberColor = useCustomizationStore(state => state.setNumberColor)
+  const setNumberFontSize = useCustomizationStore(state => state.setNumberFontSize)
+  const setNumberPosition = useCustomizationStore(state => state.setNumberPosition)
+  const setNumberRotation = useCustomizationStore(state => state.setNumberRotation)
+  const setNumberScale = useCustomizationStore(state => state.setNumberScale)
+
   const setLogoUrl = useCustomizationStore(state => state.setLogoUrl)
   const setLogoPosition = useCustomizationStore(state => state.setLogoPosition)
   const setLogoRotation = useCustomizationStore(state => state.setLogoRotation)
@@ -53,13 +71,13 @@ export const useLibraryActions = () => {
    */
   const handleLoadDesign = async (id) => {
     const loadingToast = toast.loading('Fetching design data...')
-    
+
     try {
       const response = await fetch(`/api/designs/${id}`)
       if (!response.ok) throw new Error('Failed to fetch design details')
-      
+
       const design = await response.json()
-      
+
       // Update store parameters
       setTextContent(design.text.textContent)
       setTextColor(design.text.textColor)
@@ -67,21 +85,27 @@ export const useLibraryActions = () => {
       setTextPosition(design.text.textPosition)
       setTextRotation(design.text.textRotation)
       setTextScale(design.text.textScale)
-      
+
+      if (design.number) {
+        setNumberContent(design.number.numberContent)
+        setNumberColor(design.number.numberColor)
+        setNumberFontSize(design.number.numberFontSize)
+        setNumberPosition(design.number.numberPosition)
+        setNumberRotation(design.number.numberRotation)
+        setNumberScale(design.number.numberScale)
+      }
+
       setLogoUrl(design.logo.logoUrl)
       setLogoPosition(design.logo.logoPosition)
       setLogoRotation(design.logo.logoRotation)
       setLogoScale(design.logo.logoScale)
 
-      // Handle model selection
+      // Handle model selection only if present in design (preserving current active model otherwise)
       if (design.model) {
         setCustomModelUrl(design.model.customModelUrl || null)
         setCurrentModelIndex(design.model.currentModelIndex || 0)
-      } else {
-        setCustomModelUrl(null)
-        setCurrentModelIndex(0)
       }
-      
+
       toast.success('Design loaded!', { id: loadingToast, icon: '🎨' })
     } catch (error) {
       toast.error('Error loading design: ' + error.message, { id: loadingToast })

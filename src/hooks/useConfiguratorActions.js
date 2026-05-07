@@ -19,6 +19,13 @@ export const useConfiguratorActions = () => {
   const textRotation = useCustomizationStore(state => state.textRotation)
   const textScale = useCustomizationStore(state => state.textScale)
   
+  const numberContent = useCustomizationStore(state => state.numberContent)
+  const numberColor = useCustomizationStore(state => state.numberColor)
+  const numberFontSize = useCustomizationStore(state => state.numberFontSize)
+  const numberPosition = useCustomizationStore(state => state.numberPosition)
+  const numberRotation = useCustomizationStore(state => state.numberRotation)
+  const numberScale = useCustomizationStore(state => state.numberScale)
+  
   const logoUrl = useCustomizationStore(state => state.logoUrl)
   const logoPosition = useCustomizationStore(state => state.logoPosition)
   const logoRotation = useCustomizationStore(state => state.logoRotation)
@@ -55,8 +62,8 @@ export const useConfiguratorActions = () => {
   const handleSave = () => {
     const designData = {
       text: { textContent, textColor, fontSize, textPosition, textRotation, textScale },
-      logo: { logoUrl, logoPosition, logoRotation, logoScale },
-      model: { customModelUrl, currentModelIndex }
+      number: { numberContent, numberColor, numberFontSize, numberPosition, numberRotation, numberScale },
+      logo: { logoUrl, logoPosition, logoRotation, logoScale }
     }
     saveMutation.mutate(designData)
   }
